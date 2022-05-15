@@ -471,7 +471,7 @@ public class GameViewTest extends SurfaceView implements
                 draw();
             }
             try {
-                Thread.sleep(40);
+                Thread.sleep(25);
             }catch (Exception e){
                 e.printStackTrace();
             }
