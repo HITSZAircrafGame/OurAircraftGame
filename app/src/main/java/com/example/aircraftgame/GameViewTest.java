@@ -1,7 +1,6 @@
 package com.example.aircraftgame;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,17 +21,18 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
+import PublicLockAndFlag.GameBombFlag;
+import PublicLockAndFlag.GameBossFlag;
+import PublicLockAndFlag.GameHitFlag;
+import PublicLockAndFlag.GameOverFlag;
+import PublicLockAndFlag.GameSupplyFlag;
+import PublicLockAndFlag.ShortBgmLock;
 import aircraft.AbstractAircraft;
 import aircraft.HeroAircraft;
 import application.ImageManager;
 import basic.AbstractFlyingObject;
 import bullet.BaseBullet;
-import bullet.EnemyBullet;
-import bullet.HeroBullet;
 import factory.BloodPropFactory;
 import factory.BombPropFactory;
 import factory.BossEnemyFactory;
@@ -43,11 +43,9 @@ import factory.MobEnemyFactory;
 import factory.PropFactory;
 import product.enemy.BossEnemy;
 import product.enemy.EliteEnemy;
-import product.enemy.MobEnemy;
 import product.prop.BaseProp;
 import product.prop.BloodProp;
 import product.prop.BombProp;
-import product.prop.FireProp;
 import record.PlayerRecord;
 import record.ScoreBoard;
 import strategy.ScatterShoot;
@@ -57,13 +55,12 @@ public class GameViewTest extends SurfaceView implements
         SurfaceHolder.Callback,Runnable {
 
     //SurfaceView needed
-    private int screenWidth;
-    private int screenHeight;
+    protected int screenWidth;
+    protected int screenHeight;
     boolean mbLoop = false; //控制绘画线程的标志位
-    private SurfaceHolder mSurfaceHolder;
-    private Canvas canvas;  //绘图的画布
-    private Paint mPaint;
-
+    protected SurfaceHolder mSurfaceHolder;
+    protected Canvas canvas;  //绘图的画布
+    protected Paint mPaint;
 
     /**
      * Scheduled 线程池，用于任务调度
@@ -131,6 +128,7 @@ public class GameViewTest extends SurfaceView implements
 
 
     public GameViewTest(Context context, int screenWidth, int screenHeight) {
+
         super(context);
         loadImages(); //加载图片
         heroAircraft = HeroAircraft.getHeroAircraft(new StraightShoot()); //ver2.0修改，单例模式
@@ -154,6 +152,13 @@ public class GameViewTest extends SurfaceView implements
         mSurfaceHolder = this.getHolder();
         mSurfaceHolder.addCallback(this);
         this.setFocusable(true);
+
+        //初始化标志和锁
+        GameOverFlag.gameOverFlag=false;
+        GameBossFlag.flag=false;
+        GameHitFlag.flag=false;
+        GameSupplyFlag.flag=false;
+        GameBombFlag.flag=false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -180,9 +185,10 @@ public class GameViewTest extends SurfaceView implements
         // 周期性执行（控制频率）
         if (timeCountAndNewCycleJudge()) {
             // 新敌机产生
-            if (scoreBound >= 200 && !bossAlreadyExist) { //ver4.0添加，每当在击破上一个boss机后再次得到200分以上时出现新的boss机
+            if (scoreBound >= 100 && !bossAlreadyExist) { //ver4.0添加，每当在击破上一个boss机后再次得到200分以上时出现新的boss机
                 enemyAircrafts.add(bef.createEnemy());
                 bossAlreadyExist = true;
+                GameBossFlag.flag=true;
             }
             if (enemyAircrafts.size() < enemyMaxNumber) {  //ver2.0修改过
                 if (Math.random() > eliteOccur) {
@@ -220,6 +226,7 @@ public class GameViewTest extends SurfaceView implements
             // 游戏结束
             mbLoop = false;
             gameOverFlag = true;
+            GameOverFlag.gameOverFlag=true;
             Log.i("updateGame","Game Over");
 //            System.out.println("Game Over!");
 //            System.out.println("**************Displaying ScoreBoard**************");
@@ -311,6 +318,9 @@ public class GameViewTest extends SurfaceView implements
                     continue;
                 }
                 if (enemyAircraft.crash(bullet)) {
+                    synchronized(ShortBgmLock.lock){
+                        GameHitFlag.flag=true;
+                    }
                     // 敌机撞击到英雄机子弹
                     // 敌机损失一定生命值
                     enemyAircraft.decreaseHp(bullet.getPower());
@@ -321,6 +331,11 @@ public class GameViewTest extends SurfaceView implements
                             score += 50;
                             scoreBound += 50;
                             Random r = new Random();
+                            props.add(bopf.createProp(enemyAircraft.getLocationX(),
+                                    enemyAircraft.getLocationY(),
+                                    (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                                    6*GameActivity.WINDOW_HEIGHT/700)
+                            );
                             if(Math.random() < propOccur && props.size() < propMaxNumber){
                                 if(r.nextFloat() < 0.4f){
                                     props.add(blpf.createProp(enemyAircraft.getLocationX(),
@@ -345,6 +360,7 @@ public class GameViewTest extends SurfaceView implements
                         } else if (enemyAircraft instanceof BossEnemy) { //如果是boss敌机，加分最多，必爆三种道具之一
                             score += 100;
                             bossAlreadyExist = false;
+                            GameBossFlag.flag=false;
                             scoreBound = 0;
                             if(Math.random() < 0.4f){
                                 props.add(blpf.createProp(enemyAircraft.getLocationX(),
@@ -387,9 +403,15 @@ public class GameViewTest extends SurfaceView implements
                 continue;
             }
             if (heroAircraft.crash(prop)){
+                synchronized(ShortBgmLock.lock){
+                    GameSupplyFlag.flag=true;
+                }
                 if (prop instanceof BloodProp){
                     heroAircraft.setHp(heroAircraft.getHp() + ((BloodProp) prop).getBloodHeal());
                 } else if (prop instanceof BombProp){
+                    synchronized (ShortBgmLock.lock){
+                        GameBombFlag.flag=true;
+                    }
                     System.out.println("BombSupply active!");
                 } else {
                     heroAircraft.setShootWay(new ScatterShoot());
