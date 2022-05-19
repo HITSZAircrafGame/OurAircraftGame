@@ -2,7 +2,10 @@ package com.example.aircraftgame;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -13,6 +16,8 @@ import android.os.Build;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -22,17 +27,12 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import aircraft.AbstractAircraft;
 import aircraft.HeroAircraft;
 import application.ImageManager;
 import basic.AbstractFlyingObject;
 import bullet.BaseBullet;
-import bullet.EnemyBullet;
-import bullet.HeroBullet;
 import factory.BloodPropFactory;
 import factory.BombPropFactory;
 import factory.BossEnemyFactory;
@@ -43,12 +43,9 @@ import factory.MobEnemyFactory;
 import factory.PropFactory;
 import product.enemy.BossEnemy;
 import product.enemy.EliteEnemy;
-import product.enemy.MobEnemy;
 import product.prop.BaseProp;
 import product.prop.BloodProp;
 import product.prop.BombProp;
-import product.prop.FireProp;
-import record.PlayerRecord;
 import record.ScoreBoard;
 import strategy.ScatterShoot;
 import strategy.StraightShoot;
@@ -108,8 +105,9 @@ public class GameViewTest extends SurfaceView implements
     private final PropFactory bopf = new BombPropFactory(); //ver2.0添加
     private final PropFactory fpf = new FirePropFactory(); //ver2.0添加
 
-    private boolean gameOverFlag = false;
+    public boolean gameOverFlag = false;
     private int score = 0;
+    private String recordedtime;
     private int time = 0;
     private int scoreBound = 0; //ver4.0添加，用于决定boss机出现的得分阈值
     private boolean bossAlreadyExist = false; //ver4.0添加，用于判定场上目前是否有boss机
@@ -120,18 +118,17 @@ public class GameViewTest extends SurfaceView implements
     private int cycleDuration = 600;
     private int cycleTime = 0;
 
-//    private ScoreBoard sb = new ScoreBoard();
-
     /**
      *滚动的参数
      * **/
     protected int y1;
     protected int y2;
 
-
+    private Context parentContext;
 
     public GameViewTest(Context context, int screenWidth, int screenHeight) {
         super(context);
+//        parentContext = context;
         loadImages(); //加载图片
         heroAircraft = HeroAircraft.getHeroAircraft(new StraightShoot()); //ver2.0修改，单例模式
         enemyAircrafts = new LinkedList<>();
@@ -139,11 +136,11 @@ public class GameViewTest extends SurfaceView implements
         enemyBullets = new LinkedList<>();
         props = new LinkedList<>(); //ver1.0添加
 
-        /**
-         * Scheduled 线程池，用于定时任务调度
-         * 关于alibaba code guide：可命名的 ThreadFactory 一般需要第三方包
-         * apache 第三方库： org.apache.commons.lang3.concurrent.BasicThreadFactory
-         */
+//        /**
+//         * Scheduled 线程池，用于定时任务调度
+//         * 关于alibaba code guide：可命名的 ThreadFactory 一般需要第三方包
+//         * apache 第三方库： org.apache.commons.lang3.concurrent.BasicThreadFactory
+//         */
 //        this.executorService = new ScheduledThreadPoolExecutor(1);
 //                ,new BasicThreadFactory.Builder().namingPattern("game-action-%d").daemon(true).build());
 
@@ -171,6 +168,14 @@ public class GameViewTest extends SurfaceView implements
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
         mbLoop = false;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public String getTime() {
+        return recordedtime;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -218,13 +223,16 @@ public class GameViewTest extends SurfaceView implements
         // 游戏结束检查
         if (heroAircraft.getHp() <= 0) {
             // 游戏结束
+            recordTime();
             mbLoop = false;
             gameOverFlag = true;
-            Log.i("updateGame","Game Over");
-//            System.out.println("Game Over!");
-//            System.out.println("**************Displaying ScoreBoard**************");
-//            recordScoreAction(score,sb); //ver4.0添加，该方法将玩家本次游玩成绩写入文件
-//            printScoreBoard(sb); // ver4.0添加，该方法输出此时的积分榜
+
+            parentContext = this.getContext();
+            Intent intent = new Intent(parentContext,RankBoard.class);
+            parentContext.startActivity(intent);
+//            recordTip(parentContext);
+//            intent.putExtra("enteredName", enteredName);
+//            parentContext.startActivity(intent);
         }
     }
 
@@ -423,25 +431,12 @@ public class GameViewTest extends SurfaceView implements
     }
 
     /**
-     * 将每次游玩成绩写入文件
+     * 获取成绩达成的时间
      * */
-    private void recordScoreAction(int score, ScoreBoard sb) {
+    private void recordTime() {
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String time = sdf.format(date);
-        sb.addRecord(score, time);
-        sb.updateRecords();
-    }
-
-    /**
-     * 输出当前的积分榜情况到控制台
-     * */
-    private void printScoreBoard(ScoreBoard sb) {
-        List<PlayerRecord> list = sb.getAllRecords();
-        System.out.println("Rank\tPlayerName\t Score\t Time");
-        for (PlayerRecord pr : list) {
-            System.out.println("No." + (list.indexOf(pr) + 1) + "\t" + pr.toString());
-        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        recordedtime = sdf.format(date);
     }
 
     /**

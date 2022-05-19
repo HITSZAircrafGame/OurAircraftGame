@@ -3,6 +3,10 @@ package com.example.aircraftgame;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -10,6 +14,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import aircraft.HeroAircraft;
 import strategy.StraightShoot;
@@ -17,7 +23,8 @@ import strategy.StraightShoot;
 public class GameActivity extends AppCompatActivity {
     public static int WINDOW_WIDTH;
     public static int WINDOW_HEIGHT;
-    private GameViewTest gvt;
+
+    private static GameViewTest gvt;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -43,5 +50,9 @@ public class GameActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         WINDOW_WIDTH = dm.widthPixels;
         WINDOW_HEIGHT = dm.heightPixels;
+    }
+
+    public static GameViewTest getGvt() {
+        return gvt;
     }
 }
