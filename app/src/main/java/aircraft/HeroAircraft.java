@@ -7,6 +7,7 @@ import bullet.BaseBullet;
 import strategy.ShootStrategy;
 
 import java.util.List;
+import java.util.Observable;
 
 /**
  * 英雄飞机，游戏玩家操控
@@ -52,7 +53,7 @@ public class HeroAircraft extends AbstractAircraft {
                     heroAircraft = new HeroAircraft(
                             GameActivity.WINDOW_WIDTH / 2,
                             GameActivity.WINDOW_HEIGHT - ImageManager.HERO_IMAGE.getHeight() ,
-                            0, 0, 100, shootWay);
+                            0, 0, 1000, shootWay);
                 }
             }
         }
@@ -89,4 +90,5 @@ public class HeroAircraft extends AbstractAircraft {
     public List<BaseBullet> shoot() {
         return shootWay.doShoot(locationX, locationY, power, shootNum, direction, this);
     }
+
 }
