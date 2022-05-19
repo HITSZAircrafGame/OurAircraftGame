@@ -1,5 +1,5 @@
 package PublicLockAndFlag;
 
 public class ShortBgmLock {
-    public static Object lock=new Object();
+    public static final Object lock=new Object();
 }
