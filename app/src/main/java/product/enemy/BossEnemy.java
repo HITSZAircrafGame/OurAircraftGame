@@ -38,4 +38,9 @@ public class BossEnemy extends BaseEnemy {
     public List<BaseBullet> shoot(){
         return shootWay.doShoot(locationX, locationY, power, shootNum, direction, this);
     }
+
+    @Override
+    public void update(){
+        this.decreaseHp(100);
+    }
 }

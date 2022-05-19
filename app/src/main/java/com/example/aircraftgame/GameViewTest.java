@@ -24,6 +24,7 @@ import java.util.Random;
 
 import PublicLockAndFlag.GameBombFlag;
 import PublicLockAndFlag.GameBossFlag;
+import PublicLockAndFlag.GameFireSupplyLock;
 import PublicLockAndFlag.GameHitFlag;
 import PublicLockAndFlag.GameOverFlag;
 import PublicLockAndFlag.GameSupplyFlag;
@@ -62,10 +63,6 @@ public class GameViewTest extends SurfaceView implements
     protected Canvas canvas;  //绘图的画布
     protected Paint mPaint;
 
-    /**
-     * Scheduled 线程池，用于任务调度
-     */
-//    private final ScheduledExecutorService executorService;
 
     /**
      * 时间间隔(ms)，控制刷新频率
@@ -125,7 +122,16 @@ public class GameViewTest extends SurfaceView implements
     protected int y1;
     protected int y2;
 
+    /**
+     * 火力道具生效标记
+     * **/
 
+    protected int fireActive;
+
+    /**
+     * 炸弹是否生效
+     * **/
+    public boolean isBomb;
 
     public GameViewTest(Context context, int screenWidth, int screenHeight) {
 
@@ -159,6 +165,10 @@ public class GameViewTest extends SurfaceView implements
         GameHitFlag.flag=false;
         GameSupplyFlag.flag=false;
         GameBombFlag.flag=false;
+
+        //初始化
+        fireActive=0;
+        isBomb=false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -218,8 +228,6 @@ public class GameViewTest extends SurfaceView implements
         // 后处理
         postProcessAction();
 
-        //每个时刻重绘界面
-//            draw();
 
         // 游戏结束检查
         if (heroAircraft.getHp() <= 0) {
@@ -228,10 +236,6 @@ public class GameViewTest extends SurfaceView implements
             gameOverFlag = true;
             GameOverFlag.gameOverFlag=true;
             Log.i("updateGame","Game Over");
-//            System.out.println("Game Over!");
-//            System.out.println("**************Displaying ScoreBoard**************");
-//            recordScoreAction(score,sb); //ver4.0添加，该方法将玩家本次游玩成绩写入文件
-//            printScoreBoard(sb); // ver4.0添加，该方法输出此时的积分榜
         }
     }
 
@@ -326,61 +330,22 @@ public class GameViewTest extends SurfaceView implements
                     enemyAircraft.decreaseHp(bullet.getPower());
                     bullet.vanish();
                     if (enemyAircraft.notValid()) {
+                        props.add(bopf.createProp(enemyAircraft.getLocationX(),
+                                enemyAircraft.getLocationY(),
+                                (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                                6*GameActivity.WINDOW_HEIGHT/700)
+                        );
                         // TODO 获得分数，产生道具补给
                         if (enemyAircraft instanceof EliteEnemy){  //如果是精英敌机，则击破加分更多，且有几率爆出强化道具
                             score += 50;
                             scoreBound += 50;
-                            Random r = new Random();
-                            props.add(bopf.createProp(enemyAircraft.getLocationX(),
-                                    enemyAircraft.getLocationY(),
-                                    (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
-                                    6*GameActivity.WINDOW_HEIGHT/700)
-                            );
-                            if(Math.random() < propOccur && props.size() < propMaxNumber){
-                                if(r.nextFloat() < 0.4f){
-                                    props.add(blpf.createProp(enemyAircraft.getLocationX(),
-                                            enemyAircraft.getLocationY(),
-                                            (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
-                                            6*GameActivity.WINDOW_HEIGHT/700)
-                                    );
-                                } else if(r.nextFloat() < 0.8f){
-                                    props.add(fpf.createProp(enemyAircraft.getLocationX(),
-                                            enemyAircraft.getLocationY(),
-                                            (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
-                                            6*GameActivity.WINDOW_HEIGHT/700)
-                                    );
-                                } else{
-                                    props.add(bopf.createProp(enemyAircraft.getLocationX(),
-                                            enemyAircraft.getLocationY(),
-                                            (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
-                                            6*GameActivity.WINDOW_HEIGHT/700)
-                                    );
-                                }
-                            }
-                        } else if (enemyAircraft instanceof BossEnemy) { //如果是boss敌机，加分最多，必爆三种道具之一
+                            createEliteProps(enemyAircraft);
+                        } else if (enemyAircraft instanceof BossEnemy) { //如果是boss敌机，加分最多，必爆三种道具
                             score += 100;
                             bossAlreadyExist = false;
                             GameBossFlag.flag=false;
                             scoreBound = 0;
-                            if(Math.random() < 0.4f){
-                                props.add(blpf.createProp(enemyAircraft.getLocationX(),
-                                        enemyAircraft.getLocationY(),
-                                        (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
-                                        6*GameActivity.WINDOW_HEIGHT/700)
-                                );
-                            } else if(Math.random() < 0.8f){
-                                props.add(fpf.createProp(enemyAircraft.getLocationX(),
-                                        enemyAircraft.getLocationY(),
-                                        (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
-                                        6*GameActivity.WINDOW_HEIGHT/700)
-                                );
-                            } else{
-                                props.add(bopf.createProp(enemyAircraft.getLocationX(),
-                                        enemyAircraft.getLocationY(),
-                                        (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
-                                        6*GameActivity.WINDOW_HEIGHT/700)
-                                );
-                            }
+                            createBossProp(enemyAircraft);
 
                         } else {
                             score += 10;
@@ -412,20 +377,144 @@ public class GameViewTest extends SurfaceView implements
                     synchronized (ShortBgmLock.lock){
                         GameBombFlag.flag=true;
                     }
+                    bombActive(prop);
+                    isBomb=true;
                     System.out.println("BombSupply active!");
                 } else {
-                    heroAircraft.setShootWay(new ScatterShoot());
-                    if(heroAircraft.getShootNum() < 3) { //最多5发子弹散射
-                        heroAircraft.setShootNum(heroAircraft.getShootNum() + 1);
-                        System.out.println("FireSupply active!");
-                    } else {
-                        System.out.println("Now nobody can beat you!");
+                    synchronized (GameFireSupplyLock.lock1){
+                        fireActive++;
+                    }
+                    if(fireActive<=5){
+                        Log.i("Fire","Fire supply start");
+                        heroAircraft.setShootWay(new ScatterShoot());
+                        Runnable r=()->{
+                            int lastFireActive;
+                            lastFireActive=fireActive;
+                            synchronized (GameFireSupplyLock.lock){
+                                if(heroAircraft.getShootNum() < 3) { //最多3发子弹散射
+                                    heroAircraft.setShootNum(heroAircraft.getShootNum() + 1);
+                                    System.out.println("FireSupply active!");
+                                } else {
+                                    System.out.println("Now nobody can beat you!");
+                                }
+                            }
+                            //道具生效10ms
+                            try{
+                                Thread.sleep(10000);
+                            }
+                            catch(Exception e){
+                                e.printStackTrace();
+                            }
+
+                            //火力道具效果结束
+                            if(lastFireActive==fireActive||lastFireActive==5){
+                                synchronized (GameFireSupplyLock.lock1) {
+                                    fireActive = 0;
+                                    heroAircraft.setShootWay(new StraightShoot());
+                                    heroAircraft.setShootNum(1);
+                                    Log.i("Fire", "Fire supply over");
+                                }
+                            }
+                        };
+                        new Thread(r).start();
                     }
                 }
                 prop.vanish();
             }
         }
 
+        if(isBomb){
+            createTool();
+            isBomb=false;
+        }
+
+    }
+
+
+    /**
+     * 炸弹生效函数
+     * **/
+    public void bombActive(BaseProp tool){
+
+        //加入观察者
+        tool.addObserver(enemyBullets);
+        tool.addObserver(enemyAircrafts);
+
+        //唤醒观察者
+        score+=tool.notifyAllObserver();
+
+
+    }
+
+    /**
+     * 炸弹生效时消灭敌机产生道具
+     * **/
+    public void createTool(){
+        //根据观察者的状态生成道具
+        for (int i=0;i<enemyAircrafts.size();i++){
+            if(enemyAircrafts.get(i) instanceof EliteEnemy&&(enemyAircrafts.get(i).notValid())){
+                createEliteProps(enemyAircrafts.get(i));
+            }
+            else if(enemyAircrafts.get(i) instanceof BossEnemy&&(enemyAircrafts.get(i).notValid())){
+                createBossProp(enemyAircrafts.get(i));
+                bossAlreadyExist = false;
+                GameBossFlag.flag=false;
+                scoreBound = 0;
+            }
+        }
+    }
+
+    /**
+     * 道具生辰逻辑
+     * **/
+    public void createEliteProps(AbstractAircraft enemyAircraft){
+        Random r = new Random();
+        if(Math.random() < propOccur && props.size() < propMaxNumber){
+            if(r.nextFloat() < 0.4f){
+                props.add(blpf.createProp(enemyAircraft.getLocationX(),
+                        enemyAircraft.getLocationY(),
+                        (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                        6*GameActivity.WINDOW_HEIGHT/700)
+                );
+            } else if(r.nextFloat() < 0.8f){
+                props.add(fpf.createProp(enemyAircraft.getLocationX(),
+                        enemyAircraft.getLocationY(),
+                        (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                        6*GameActivity.WINDOW_HEIGHT/700)
+                );
+            } else{
+                props.add(bopf.createProp(enemyAircraft.getLocationX(),
+                        enemyAircraft.getLocationY(),
+                        (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                        6*GameActivity.WINDOW_HEIGHT/700)
+                );
+            }
+        }
+    }
+
+    /**
+     * 创建Boss机击毁后的道具
+     * **/
+    public void createBossProp(AbstractAircraft enemyAircraft){
+        int x;
+        int y;
+        x=enemyAircraft.getLocationX();
+        y=enemyAircraft.getLocationY();
+        props.add(blpf.createProp(x,
+                y,
+                (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                6*GameActivity.WINDOW_HEIGHT/700)
+        );
+        props.add(fpf.createProp(x+5+(Math.random()<0.5?1:-1)*(int)(Math.random()*GameActivity.WINDOW_WIDTH/10),
+                y+10+(int)(Math.random()*GameActivity.WINDOW_HEIGHT/20),
+                (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                6*GameActivity.WINDOW_HEIGHT/700)
+        );
+        props.add(bopf.createProp(x-5+(Math.random()<0.5?1:-1)*(int)(Math.random()*GameActivity.WINDOW_WIDTH/10),
+                y-10+(int)(Math.random()*GameActivity.WINDOW_HEIGHT/20),
+                (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                6*GameActivity.WINDOW_HEIGHT/700)
+        );
     }
 
     /**

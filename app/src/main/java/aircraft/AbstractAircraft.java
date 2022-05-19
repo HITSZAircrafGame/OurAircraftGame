@@ -5,6 +5,7 @@ import bullet.BaseBullet;
 import strategy.ShootStrategy;
 
 import java.util.List;
+import Observer.*;
 
 /**
  * 所有种类飞机的抽象父类：
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @author hitsz
  */
-public abstract class AbstractAircraft extends AbstractFlyingObject {
+public abstract class AbstractAircraft extends AbstractFlyingObject implements Observer {
     /**
      * 生命值
      */
@@ -65,6 +66,10 @@ public abstract class AbstractAircraft extends AbstractFlyingObject {
      *  非可射击对象空实现，返回null
      */
     public abstract List<BaseBullet> shoot();
+
+    public void update(){
+        vanish();
+    }
 }
 
 

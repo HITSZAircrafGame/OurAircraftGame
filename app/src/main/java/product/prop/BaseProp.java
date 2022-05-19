@@ -2,12 +2,18 @@ package product.prop;
 
 import com.example.aircraftgame.GameActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import Observer.Object;
+import Observer.Observer;
 import basic.AbstractFlyingObject;
 
-public abstract class BaseProp extends AbstractFlyingObject {
-
+public abstract class BaseProp extends AbstractFlyingObject implements Object {
+    List<Observer> observerList;
     public BaseProp(int locationX, int locationY, int speedX, int speedY){
         super(locationX, locationY, speedX, speedY);
+        this.observerList=new ArrayList<>();
     }
 
     @Override
@@ -20,4 +26,7 @@ public abstract class BaseProp extends AbstractFlyingObject {
             vanish();
         }
     }
+
+
+
 }
