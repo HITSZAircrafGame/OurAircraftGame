@@ -11,6 +11,8 @@ import android.widget.Switch;
 
 public class MainMenu extends AppCompatActivity {
 
+    private boolean videoOn = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,16 +53,14 @@ public class MainMenu extends AppCompatActivity {
         s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                boolean videoOn = false;
                 if(isChecked){
                     videoOn = true;
-                    intent.putExtra("videoIsNeeded",videoOn);
+//                    intent.putExtra("videoIsNeeded",videoOn);
                 } else {
-
-                    intent.putExtra("videoIsNeeded", videoOn);
+//                    intent.putExtra("videoIsNeeded", videoOn);
                 }
             }
         });
-
+        intent.putExtra("videoIsNeeded",videoOn);
     }
 }

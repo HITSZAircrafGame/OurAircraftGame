@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -29,8 +30,8 @@ import record.ScoreBoard;
 
 public class RankBoard extends AppCompatActivity {
 
-    private ScoreBoard sb = new ScoreBoard();
-    private String enteredName;
+    private ScoreBoard sb;
+    private String difficultyString;
     private RankBoardAdapter rba;
 
     @Override
@@ -38,14 +39,18 @@ public class RankBoard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rank_board);
 
+        //转化难度字符串
+        setDifficultyString();
+
+        //创建排行榜对象
+        sb = new ScoreBoard(difficultyString);
+
         //为删除按钮添加监听器
-        Button deleteButton = (Button)findViewById(R.id.DeleteButton);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteTip();
-            }
-        });
+        deleteButtonSetListener();
+
+        //设置排行榜显示的难度
+        showDifficulty();
+
         //先弹出对话框看要不要输入姓名记录成绩
         recordTip();
 
@@ -68,10 +73,10 @@ public class RankBoard extends AppCompatActivity {
                     .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            enteredName = editText.getText().toString();
+                            String enteredName = editText.getText().toString();
                             int score = GameActivity.getGvt().getScore();
                             String time = GameActivity.getGvt().getTime();
-                            sb.addRecord(enteredName, score, time);
+                            sb.addRecord(enteredName, score, time, difficultyString);
                             Toast.makeText(RankBoard.this, "您的本次游玩成绩已被记录",
                                             Toast.LENGTH_SHORT).show();
                             showScoreBoard();
@@ -128,11 +133,68 @@ public class RankBoard extends AppCompatActivity {
         alert.show();
     }
 
+    /**
+     * 显示排行榜具体界面
+     * */
     private void showScoreBoard(){
         RecyclerView rv = findViewById(R.id.recyclerView);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
         rba = new RankBoardAdapter(sb.getAllRecords());
         rv.setAdapter(rba);
+    }
+
+    /**
+     * 显示难度标签
+     * */
+    private void showDifficulty(){
+        TextView tv = (TextView)findViewById(R.id.DifficultyTag);
+        switch (GameActivity.getGameDifficulty()){
+            case 1: {
+                tv.setText("难度：简单");
+                break;
+            }
+            case 2: {
+                tv.setText("难度：中等");
+                break;
+            }
+            case 3: {
+                tv.setText("难度：困难");
+                break;
+            }
+        }
+    }
+
+    /**
+     * 为删除按钮添加监听器
+     * */
+    private void deleteButtonSetListener(){
+        Button deleteButton = (Button)findViewById(R.id.DeleteButton);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteTip();
+            }
+        });
+    }
+
+    /**
+     * 将游戏难度转换为字符串存储到玩家游玩记录中
+     * */
+    private void setDifficultyString(){
+        switch (GameActivity.getGameDifficulty()){
+            case 1: {
+                difficultyString = "简单";
+                break;
+            }
+            case 2: {
+                difficultyString = "中等";
+                break;
+            }
+            case 3: {
+                difficultyString = "困难";
+                break;
+            }
+        }
     }
 }

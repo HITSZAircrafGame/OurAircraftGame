@@ -8,10 +8,11 @@ public class PlayerRecord extends LitePalSupport{
     private String time;
     private String difficulty;
 
-    public PlayerRecord(String name, int score, String time){
+    public PlayerRecord(String name, int score, String time, String difficulty){
         this.name = name;
         this.score = score;
         this.time = time;
+        this.difficulty = difficulty;
     }
 
     public int getScore(){

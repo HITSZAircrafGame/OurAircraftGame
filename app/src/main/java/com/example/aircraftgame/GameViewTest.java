@@ -1,11 +1,8 @@
 package com.example.aircraftgame;
 
 import android.annotation.SuppressLint;
-<<<<<<< HEAD
 import android.app.Activity;
 import android.app.AlertDialog;
-=======
->>>>>>> 29d227887b35b0c2692e7249da07dcf28c4bd364
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -56,10 +53,6 @@ import product.enemy.EliteEnemy;
 import product.prop.BaseProp;
 import product.prop.BloodProp;
 import product.prop.BombProp;
-<<<<<<< HEAD
-=======
-import record.PlayerRecord;
->>>>>>> 29d227887b35b0c2692e7249da07dcf28c4bd364
 import record.ScoreBoard;
 import strategy.ScatterShoot;
 import strategy.StraightShoot;
@@ -133,9 +126,7 @@ public class GameViewTest extends SurfaceView implements
     protected int y1;
     protected int y2;
 
-<<<<<<< HEAD
     private Context parentContext;
-=======
     /**
      * 火力道具生效标记
      * **/
@@ -146,7 +137,6 @@ public class GameViewTest extends SurfaceView implements
      * 炸弹是否生效
      * **/
     public boolean isBomb;
->>>>>>> 29d227887b35b0c2692e7249da07dcf28c4bd364
 
     public GameViewTest(Context context, int screenWidth, int screenHeight) {
 
@@ -259,7 +249,6 @@ public class GameViewTest extends SurfaceView implements
             recordTime();
             mbLoop = false;
             gameOverFlag = true;
-<<<<<<< HEAD
 
             parentContext = this.getContext();
             Intent intent = new Intent(parentContext,RankBoard.class);
@@ -267,10 +256,8 @@ public class GameViewTest extends SurfaceView implements
 //            recordTip(parentContext);
 //            intent.putExtra("enteredName", enteredName);
 //            parentContext.startActivity(intent);
-=======
             GameOverFlag.gameOverFlag=true;
             Log.i("updateGame","Game Over");
->>>>>>> 29d227887b35b0c2692e7249da07dcf28c4bd364
         }
     }
 
