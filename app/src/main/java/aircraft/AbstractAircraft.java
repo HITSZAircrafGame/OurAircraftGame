@@ -70,6 +70,7 @@ public abstract class AbstractAircraft extends AbstractFlyingObject implements O
     public void update(){
         vanish();
     }
+
 }
 
 

@@ -58,7 +58,7 @@ public class GameViewTest extends SurfaceView implements
     //SurfaceView needed
     protected int screenWidth;
     protected int screenHeight;
-    boolean mbLoop = false; //控制绘画线程的标志位
+    protected boolean mbLoop = false; //控制绘画线程的标志位
     protected SurfaceHolder mSurfaceHolder;
     protected Canvas canvas;  //绘图的画布
     protected Paint mPaint;
@@ -67,52 +67,52 @@ public class GameViewTest extends SurfaceView implements
     /**
      * 时间间隔(ms)，控制刷新频率
      */
-    private int timeInterval = 40;
+    protected int timeInterval = 40;
 
-    private final HeroAircraft heroAircraft;
-    private final List<AbstractAircraft> enemyAircrafts;
-    private final List<BaseBullet> heroBullets;
-    private final List<BaseBullet> enemyBullets;
-    private final List<BaseProp> props; //ver1.0添加
+    protected final HeroAircraft heroAircraft;
+    protected final List<AbstractAircraft> enemyAircrafts;
+    protected final List<BaseBullet> heroBullets;
+    protected final List<BaseBullet> enemyBullets;
+    protected final List<BaseProp> props; //ver1.0添加
 
-    private int enemyMaxNumber = 5; //场上最多出现的敌机数量，暂定为5
+    protected int enemyMaxNumber = 5; //场上最多出现的敌机数量，暂定为5
 
-    private int mobHp = 30; //ver2.0添加，普通敌机生命值（随难度改变，目前暂定为30（一次受击））
-    private int mobSpeedY = 10*GameActivity.WINDOW_HEIGHT/500; //ver2.0添加，普通敌机纵向移速（随难度改变，目前暂定为10）
+    protected int mobHp = 30; //ver2.0添加，普通敌机生命值（随难度改变，目前暂定为30（一次受击））
+    protected int mobSpeedY = 10*GameActivity.WINDOW_HEIGHT/500; //ver2.0添加，普通敌机纵向移速（随难度改变，目前暂定为10）
 
-    private float eliteOccur = 0.3f; //ver1.0添加，用于设置精英敌机出现的频率（随难度变化，目前暂定为10%）
-    private int eliteHp = 60; //ver1.0添加，用于设置精英敌机的生命值（随难度变化，目前暂定为60（两次攻击））
-    private int elitePower = 15; //ver2.0添加，精英敌机单个子弹的威力（随难度成比例改变,目前暂定为15）
-    private int eliteBulletSpeed = 10*GameActivity.WINDOW_HEIGHT/500; //ver2.0添加，精英敌机子弹速度（随难度成比例改变，越慢越难（因为慢就密集），目前暂定为12）
+    protected float eliteOccur = 0.3f; //ver1.0添加，用于设置精英敌机出现的频率（随难度变化，目前暂定为10%）
+    protected int eliteHp = 60; //ver1.0添加，用于设置精英敌机的生命值（随难度变化，目前暂定为60（两次攻击））
+    protected int elitePower = 15; //ver2.0添加，精英敌机单个子弹的威力（随难度成比例改变,目前暂定为15）
+    protected int eliteBulletSpeed = 10*GameActivity.WINDOW_HEIGHT/500; //ver2.0添加，精英敌机子弹速度（随难度成比例改变，越慢越难（因为慢就密集），目前暂定为12）
 
-    private int bossHp = 200; //ver4.0添加，用于设置boss敌机的生命值（随难度变化，目前暂定为150（五发子弹））
-    private int bossPower = 20; //ver4.0添加，boss敌机单个子弹的威力（随难度成比例改变,目前暂定为20）
-    private int bossBulletSpeed = 10*GameActivity.WINDOW_HEIGHT/500; //ver4.0添加，boss敌机子弹速度（随难度成比例改变，目前暂定为9）
-    private int bossShootNum = 3; //ver4.0添加，boss敌机子弹数量（随难度改变，数越大横向散射的子弹越多，目前暂定为5）
+    protected int bossHp = 200; //ver4.0添加，用于设置boss敌机的生命值（随难度变化，目前暂定为150（五发子弹））
+    protected int bossPower = 20; //ver4.0添加，boss敌机单个子弹的威力（随难度成比例改变,目前暂定为20）
+    protected int bossBulletSpeed = 10*GameActivity.WINDOW_HEIGHT/500; //ver4.0添加，boss敌机子弹速度（随难度成比例改变，目前暂定为9）
+    protected int bossShootNum = 3; //ver4.0添加，boss敌机子弹数量（随难度改变，数越大横向散射的子弹越多，目前暂定为5）
 
-    private final EnemyFactory mef = new MobEnemyFactory(mobHp,mobSpeedY); //ver2.0添加
-    private final EnemyFactory eef = new EliteEnemyFactory(eliteHp,elitePower,eliteBulletSpeed); //ver2.0添加
-    private final EnemyFactory bef = new BossEnemyFactory(bossHp, bossPower, bossBulletSpeed, bossShootNum); //ver4.0添加
+    protected  EnemyFactory mef = new MobEnemyFactory(mobHp,mobSpeedY); //ver2.0添加
+    protected  EnemyFactory eef = new EliteEnemyFactory(eliteHp,elitePower,eliteBulletSpeed); //ver2.0添加
+    protected  EnemyFactory bef = new BossEnemyFactory(bossHp, bossPower, bossBulletSpeed, bossShootNum); //ver4.0添加
 
-    private float propMaxNumber = 5; //ver1.0添加，用于设置当前场上最多能存在的道具数（可能根据难度而变化）
-    private float propOccur = 0.8f; //ver1.0添加，用于设置精英敌机爆出道具的频率
-    private int bloodHeal = 40;  //回血道具回复的血量值，随难度增加而增加，目前暂定为40
+    protected float propMaxNumber = 5; //ver1.0添加，用于设置当前场上最多能存在的道具数（可能根据难度而变化）
+    protected float propOccur = 0.8f; //ver1.0添加，用于设置精英敌机爆出道具的频率
+    protected int bloodHeal = 40;  //回血道具回复的血量值，随难度增加而增加，目前暂定为40
 
-    private final PropFactory blpf = new BloodPropFactory(bloodHeal); //ver2.0添加
-    private final PropFactory bopf = new BombPropFactory(); //ver2.0添加
-    private final PropFactory fpf = new FirePropFactory(); //ver2.0添加
+    protected final PropFactory blpf = new BloodPropFactory(bloodHeal); //ver2.0添加
+    protected final PropFactory bopf = new BombPropFactory(); //ver2.0添加
+    protected final PropFactory fpf = new FirePropFactory(); //ver2.0添加
 
-    private boolean gameOverFlag = false;
-    private int score = 0;
-    private int time = 0;
-    private int scoreBound = 0; //ver4.0添加，用于决定boss机出现的得分阈值
-    private boolean bossAlreadyExist = false; //ver4.0添加，用于判定场上目前是否有boss机
+    protected boolean gameOverFlag = false;
+    protected int score = 0;
+    protected int time = 0;
+    protected int scoreBound = 0; //ver4.0添加，用于决定boss机出现的得分阈值
+    protected boolean bossAlreadyExist = false; //ver4.0添加，用于判定场上目前是否有boss机
     /**
      * 周期（ms)
      * 指示子弹的发射、敌机的产生频率
      */
-    private int cycleDuration = 600;
-    private int cycleTime = 0;
+    protected int cycleDuration = 600;
+    protected int cycleTime = 0;
 
 //    private ScoreBoard sb = new ScoreBoard();
 
@@ -132,6 +132,13 @@ public class GameViewTest extends SurfaceView implements
      * 炸弹是否生效
      * **/
     public boolean isBomb;
+
+    /**射速**/
+    protected int heroShootSpeed;
+    protected  int enemyShootSpeed;
+
+    /**boss机阈值**/
+    protected int bossScore;
 
     public GameViewTest(Context context, int screenWidth, int screenHeight) {
 
@@ -169,6 +176,9 @@ public class GameViewTest extends SurfaceView implements
         //初始化
         fireActive=0;
         isBomb=false;
+        bossScore=100;
+        enemyShootSpeed=1200;
+        heroShootSpeed=600;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -192,22 +202,7 @@ public class GameViewTest extends SurfaceView implements
     public void updateGame(){
         time += timeInterval;
 
-        // 周期性执行（控制频率）
-        if (timeCountAndNewCycleJudge()) {
-            // 新敌机产生
-            if (scoreBound >= 100 && !bossAlreadyExist) { //ver4.0添加，每当在击破上一个boss机后再次得到200分以上时出现新的boss机
-                enemyAircrafts.add(bef.createEnemy());
-                bossAlreadyExist = true;
-                GameBossFlag.flag=true;
-            }
-            if (enemyAircrafts.size() < enemyMaxNumber) {  //ver2.0修改过
-                if (Math.random() > eliteOccur) {
-                    enemyAircrafts.add(mef.createEnemy());
-                } else {
-                    enemyAircrafts.add(eef.createEnemy());
-                }
-            }
-        }
+        createEnemy();
 
         //将射击与敌机生成解耦
         // 飞机射出子弹
@@ -243,7 +238,7 @@ public class GameViewTest extends SurfaceView implements
     //      Action 各部分
     //***********************
 
-    private boolean timeCountAndNewCycleJudge() {
+    protected boolean timeCountAndNewCycleJudge() {
         cycleTime += timeInterval;
         if (cycleTime >= cycleDuration && cycleTime - timeInterval < cycleTime) {
             // 跨越到新的周期
@@ -254,20 +249,20 @@ public class GameViewTest extends SurfaceView implements
         }
     }
 
-    private void shootAction(int time) {
+    protected void shootAction(int time) {
         // TODO 敌机射击
         for (AbstractAircraft eliteEnemy : enemyAircrafts) {
-            if (time%1200==0){
+            if (time%enemyShootSpeed==0){
                 enemyBullets.addAll(eliteEnemy.shoot());
             }
         }
         // 英雄射击,设计周期为400ms
-        if(time%600==0){
+        if(time%heroShootSpeed==0){
             heroBullets.addAll(heroAircraft.shoot());
         }
     }
 
-    private void bulletsMoveAction() {
+    protected void bulletsMoveAction() {
         for (BaseBullet bullet : heroBullets) {
             bullet.forward();
         }
@@ -276,7 +271,7 @@ public class GameViewTest extends SurfaceView implements
         }
     }
 
-    private void aircraftsMoveAction() {
+    protected void aircraftsMoveAction() {
         for (AbstractAircraft enemyAircraft : enemyAircrafts) {
             enemyAircraft.forward();
         }
@@ -285,19 +280,57 @@ public class GameViewTest extends SurfaceView implements
     /**
      * 道具移动具体实现:...
      * */
-    private void propsMoveAction() {
+    protected void propsMoveAction() {
         for (BaseProp prop : props){
             prop.forward();
         }
     }
 
+
+    /**
+     * 敌机生成逻辑
+     * **/
+
+    public void createEnemy(){
+        // 周期性执行（控制频率）
+        if (timeCountAndNewCycleJudge()) {
+            // 新敌机产生
+            if(hook()){
+                if (scoreBound >= bossScore && !bossAlreadyExist) { //ver4.0添加，每当在击破上一个boss机后再次得到200分以上时出现新的boss机
+                    createBoss();
+                }
+            }
+            if (enemyAircrafts.size() < enemyMaxNumber) {  //ver2.0修改过
+                createMobAndElite();
+            }
+        }
+    }
+
+    public void createMobAndElite(){
+        if (Math.random() > eliteOccur) {
+            enemyAircrafts.add(mef.createEnemy());
+        } else {
+            enemyAircrafts.add(eef.createEnemy());
+        }
+    }
+
+    public void  createBoss(){
+        enemyAircrafts.add(bef.createEnemy());
+        bossAlreadyExist = true;
+        GameBossFlag.flag=true;
+    }
+
+    //钩子方法
+    public boolean hook(){
+        return false;
+    }
     /**
      * 碰撞检测：
      * 1. 敌机攻击英雄
      * 2. 英雄攻击/撞击敌机
      * 3. 英雄获得补给
      */
-    private void crashCheckAction() {
+    protected void crashCheckAction() {
         // TODO 敌机子弹攻击英雄
         for (BaseBullet bullet : enemyBullets) {
             if (bullet.notValid()) {
@@ -526,7 +559,7 @@ public class GameViewTest extends SurfaceView implements
      * 无效的原因可能是撞击或者飞出边界
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void postProcessAction() {
+    protected void postProcessAction() {
         enemyBullets.removeIf(AbstractFlyingObject::notValid);
         heroBullets.removeIf(AbstractFlyingObject::notValid);
         enemyAircrafts.removeIf(AbstractFlyingObject::notValid);
@@ -536,7 +569,7 @@ public class GameViewTest extends SurfaceView implements
     /**
      * 将每次游玩成绩写入文件
      * */
-    private void recordScoreAction(int score, ScoreBoard sb) {
+    protected void recordScoreAction(int score, ScoreBoard sb) {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String time = sdf.format(date);
@@ -547,7 +580,7 @@ public class GameViewTest extends SurfaceView implements
     /**
      * 输出当前的积分榜情况到控制台
      * */
-    private void printScoreBoard(ScoreBoard sb) {
+    protected void printScoreBoard(ScoreBoard sb) {
         List<PlayerRecord> list = sb.getAllRecords();
         System.out.println("Rank\tPlayerName\t Score\t Time");
         for (PlayerRecord pr : list) {
@@ -613,7 +646,7 @@ public class GameViewTest extends SurfaceView implements
         paintScoreAndLife(cvs);
     }
 
-    private void paintImageWithPositionRevised(Canvas cvs, List<? extends AbstractFlyingObject> objects) {
+    protected void paintImageWithPositionRevised(Canvas cvs, List<? extends AbstractFlyingObject> objects) {
         if (objects.size() == 0) {
             return;
         }
@@ -627,7 +660,7 @@ public class GameViewTest extends SurfaceView implements
     }
 
     @SuppressLint("ResourceAsColor")
-    private void paintScoreAndLife(Canvas cvs) {
+    protected void paintScoreAndLife(Canvas cvs) {
         int x = 10;
         int y = 100;
         mPaint.setColor(R.color.score_and_life_color);

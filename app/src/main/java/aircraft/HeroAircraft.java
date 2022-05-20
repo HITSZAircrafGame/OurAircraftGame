@@ -91,4 +91,7 @@ public class HeroAircraft extends AbstractAircraft {
         return shootWay.doShoot(locationX, locationY, power, shootNum, direction, this);
     }
 
+    public void setPower(int power) {
+        this.power = power;
+    }
 }
