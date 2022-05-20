@@ -109,6 +109,7 @@ public class GameViewTest extends SurfaceView implements
 
     protected boolean gameOverFlag = false;
     protected int score = 0;
+    protected String recordedtime;
     protected int time = 0;
     protected int scoreBound = 0; //ver4.0添加，用于决定boss机出现的得分阈值
     protected boolean bossAlreadyExist = false; //ver4.0添加，用于判定场上目前是否有boss机
@@ -384,11 +385,6 @@ public class GameViewTest extends SurfaceView implements
                     enemyAircraft.decreaseHp(bullet.getPower());
                     bullet.vanish();
                     if (enemyAircraft.notValid()) {
-                        props.add(bopf.createProp(enemyAircraft.getLocationX(),
-                                enemyAircraft.getLocationY(),
-                                (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
-                                6*GameActivity.WINDOW_HEIGHT/700)
-                        );
                         // TODO 获得分数，产生道具补给
                         if (enemyAircraft instanceof EliteEnemy){  //如果是精英敌机，则击破加分更多，且有几率爆出强化道具
                             score += 50;
@@ -681,7 +677,16 @@ public class GameViewTest extends SurfaceView implements
 
     public void loadImages() {
         try {
-            ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg);
+            if(GameActivity.getGameDifficulty()==1){
+                ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg);
+            }
+            else if(GameActivity.getGameDifficulty()==2){
+                ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg2);
+            }
+            else{
+                ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg3);
+            }
+
             ImageManager.HERO_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.hero);
             ImageManager.MOB_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.mob);
             ImageManager.ELITE_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.elite);

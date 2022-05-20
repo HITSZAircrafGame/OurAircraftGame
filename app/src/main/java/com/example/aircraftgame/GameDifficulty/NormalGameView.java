@@ -49,7 +49,7 @@ public class NormalGameView extends GameViewTest {
     //难度变化函数
     public void changeDifficulty(){
         if(time%2000==0){
-            rate=(rate<=2)?(Math.random()<0.5?0.1:0.2):rate;
+            rate=(rate<=2)?rate+(Math.random()<0.5?0.1:0.2):rate;
         }
 
          eliteHp = (int)(super.eliteHp*rate); //ver1.0添加，用于设置精英敌机的生命值（随难度变化，目前暂定为60（两次攻击））

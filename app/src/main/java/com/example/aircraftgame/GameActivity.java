@@ -18,6 +18,10 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.aircraftgame.GameDifficulty.DifficultGameView;
+import com.example.aircraftgame.GameDifficulty.EasyGameView;
+import com.example.aircraftgame.GameDifficulty.NormalGameView;
+
 import java.util.logging.LogManager;
 
 import MusicPlayer.MusicServer;
@@ -53,18 +57,39 @@ public class GameActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindowSize();
         setContentView(R.layout.activity_main);
-        gvt = new GameViewTest(this, WINDOW_WIDTH, WINDOW_HEIGHT);
+        switch(GameDifficulty){
+            case 1:
+                Log.i("Game","简单模式");
+                gvt = new EasyGameView(this, WINDOW_WIDTH, WINDOW_HEIGHT);
+                break;
+            case 2:
+                Log.i("Game","普通模式");
+                gvt = new NormalGameView(this, WINDOW_WIDTH, WINDOW_HEIGHT);
+                break;
+            case 3:
+                Log.i("Game","困难模式");
+                gvt = new DifficultGameView(this, WINDOW_WIDTH, WINDOW_HEIGHT);
+                break;
+            default:
+                Log.e("Game","选择错误");
+
+        }
+
         setContentView(gvt);
         //设置service播放音乐
         //新建一条线程来执行
-        Intent intent=new Intent(this, MusicServer.class);
-        new Thread(()->{
-            while(!GameOverFlag.gameOverFlag){
-                startService(intent);
-            }
+        if(GameNeedVideo){
+            Log.i("Game","播放音乐");
+            Intent intent=new Intent(this, MusicServer.class);
+            new Thread(()->{
+                while(!GameOverFlag.gameOverFlag){
+                    startService(intent);
+                }
 
-            stopService(intent);
-        }).start();
+                stopService(intent);
+            }).start();
+        }
+
     }
 
     @Override
