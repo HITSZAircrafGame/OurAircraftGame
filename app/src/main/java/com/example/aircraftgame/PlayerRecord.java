@@ -1,16 +1,18 @@
-package record;
+package com.example.aircraftgame;
 
-import java.io.Serializable;
+import org.litepal.crud.LitePalSupport;
 
-public class PlayerRecord implements Serializable{
-    private int score;
+public class PlayerRecord extends LitePalSupport{
     private String name;
+    private int score;
     private String time;
+    private String difficulty;
 
-    public PlayerRecord(int score, String name, String time){
-        this.score = score;
+    public PlayerRecord(String name, int score, String time, String difficulty){
         this.name = name;
+        this.score = score;
         this.time = time;
+        this.difficulty = difficulty;
     }
 
     public int getScore(){
@@ -25,6 +27,10 @@ public class PlayerRecord implements Serializable{
         return this.time;
     }
 
+    public String getDifficulty() {
+        return difficulty;
+    }
+
     public void setScore(int score){
         this.score = score;
     }
@@ -37,8 +43,7 @@ public class PlayerRecord implements Serializable{
         this.time = time;
     }
 
-    @Override
-    public String toString(){
-        return this.name + " \t " + this.score + " \t " + this.time;
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
     }
 }

@@ -1,9 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".RankBoard">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/DifficultyTag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="难度:" />
+
+    <View
+        android:id="@+id/topBound1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"/>
+
+    <TextView
+        android:id="@+id/RankBoardTitle"
+        android:layout_width="164dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:text="排行榜" />
+
+    <View
+        android:id="@+id/topBound2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="41dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/header1"
+            android:layout_width="66dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="名次" />
+
+        <View
+            android:id="@+id/view1"
+            android:layout_height="match_parent"
+            android:layout_width="1dp"
+            android:background="@color/black" />
+
+        <TextView
+            android:id="@+id/header2"
+            android:layout_width="109dp"
+            android:layout_height="match_parent"
+            android:text="玩家名称"
+            android:gravity="center"/>
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/black" />
+
+        <TextView
+            android:id="@+id/header3"
+            android:layout_width="83dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="积分" />
+
+        <View
+            android:id="@+id/view3"
+            android:layout_height="match_parent"
+            android:layout_width="1dp"
+            android:background="@color/black" />
+
+        <TextView
+            android:id="@+id/header4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="游玩时间"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/bottomBound1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="432dp" />
+
+    <View
+        android:id="@+id/bottomBound2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"/>
+
+    <Button
+        android:id="@+id/DeleteButton"
+        android:layout_width="193dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="30dp"
+        android:text="删除记录" />
+
+</LinearLayout>
