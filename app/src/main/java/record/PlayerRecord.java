@@ -1,4 +1,4 @@
-package com.example.aircraftgame;
+package record;
 
 import org.litepal.crud.LitePalSupport;
 

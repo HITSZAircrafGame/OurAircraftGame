@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -54,13 +55,13 @@ public class MainMenu extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
+                    Log.d("You turn on the video!","hh");
                     videoOn = true;
-//                    intent.putExtra("videoIsNeeded",videoOn);
+                    intent.putExtra("videoIsNeeded",videoOn);
                 } else {
-//                    intent.putExtra("videoIsNeeded", videoOn);
+                    intent.putExtra("videoIsNeeded", videoOn);
                 }
             }
         });
-        intent.putExtra("videoIsNeeded",videoOn);
     }
 }

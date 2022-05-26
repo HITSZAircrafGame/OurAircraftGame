@@ -639,7 +639,7 @@ public class GameViewTest extends SurfaceView implements
     private void paintScoreAndLife(Canvas cvs) {
         int x = 10;
         int y = 100;
-        mPaint.setColor(R.color.score_and_life_color);
+        mPaint.setColor(R.color.red);
         mPaint.setTypeface(Typeface.create(Typeface.SANS_SERIF,Typeface.BOLD));
         mPaint.setTextSize(100);
         cvs.drawText("SCORE:" + this.score, x, y, mPaint);

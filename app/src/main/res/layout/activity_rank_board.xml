@@ -4,9 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".RankBoard">
+    tools:context=".RankBoard"
+    android:background="@drawable/startbg">
 
     <TextView
+        android:textColor="@color/red"
+        android:textStyle="bold"
         android:id="@+id/DifficultyTag"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,6 +22,7 @@
         android:background="@color/black"/>
 
     <TextView
+        android:textStyle="bold"
         android:id="@+id/RankBoardTitle"
         android:layout_width="164dp"
         android:layout_height="24dp"
@@ -40,6 +44,7 @@
         android:orientation="horizontal">
 
         <TextView
+            android:textStyle="bold"
             android:id="@+id/header1"
             android:layout_width="66dp"
             android:layout_height="match_parent"
@@ -53,6 +58,7 @@
             android:background="@color/black" />
 
         <TextView
+            android:textStyle="bold"
             android:id="@+id/header2"
             android:layout_width="109dp"
             android:layout_height="match_parent"
@@ -66,6 +72,7 @@
             android:background="@color/black" />
 
         <TextView
+            android:textStyle="bold"
             android:id="@+id/header3"
             android:layout_width="83dp"
             android:layout_height="match_parent"
@@ -79,6 +86,7 @@
             android:background="@color/black" />
 
         <TextView
+            android:textStyle="bold"
             android:id="@+id/header4"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -111,6 +119,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="30dp"
+        android:background="@drawable/style_start_button"
         android:text="删除记录" />
 
 </LinearLayout>

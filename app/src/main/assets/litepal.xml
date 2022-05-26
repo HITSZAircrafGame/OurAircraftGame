@@ -3,6 +3,6 @@
     <dbname value="GameDataBase"></dbname>
     <version value="3"></version>
     <list>
-        <mapping class="com.example.aircraftgame.PlayerRecord"></mapping>
+        <mapping class="record.PlayerRecord"></mapping>
     </list>
 </litepal>

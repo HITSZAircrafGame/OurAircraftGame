@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">AircraftGame</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="registerPlayerName">注册账号</string>
+    <string name="registerPassword">注册密码</string>
+    <string name="registerConfirmPass">确认密码</string>
+    <string name="registerInRegister">注 册</string>
+    <string name="cancelRegister">取 消</string>
+    <string name="loginPassword">密 码</string>
+    <string name="login">登 录</string>
+    <string name="registerInLogin">注 册</string>
+    <string name="loginPlayerName">账 号</string>
+    <string name="onlineBattle">联 网 对 战</string>
+    <string name="practiceMode">训 练 模 式</string>
+    <string name="localPlaying">本 地 游 玩</string>
+    <string name="onlinePlaying">在 线 游 玩</string>
 </resources>

@@ -1,7 +1,5 @@
 package record;
 
-import com.example.aircraftgame.PlayerRecord;
-
 import java.util.List;
 
 interface RecordDao {
