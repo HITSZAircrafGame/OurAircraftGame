@@ -55,7 +55,6 @@ public class MainMenu extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    Log.d("You turn on the video!","hh");
                     videoOn = true;
                     intent.putExtra("videoIsNeeded",videoOn);
                 } else {
