@@ -18,7 +18,7 @@ public class DifficultGameView extends GameViewTest {
         enemyShootSpeed=800;
         heroShootSpeed=400;
         this.eliteOccur=0.3f;
-        this.bossHp=666;
+        this.bossHp=1000;
         bossScore=666;
         rate=1;
         bossPower=30;
@@ -39,6 +39,7 @@ public class DifficultGameView extends GameViewTest {
                 if (scoreBound >= bossScore && !bossAlreadyExist) { //ver4.0添加，每当在击破上一个boss机后再次得到200分以上时出现新的boss机
 
                     bef = new BossEnemyFactory(bossHp, bossPower, bossBulletSpeed, bossShootNum);
+                    Log.i("BossHp",bossHp+"");
                     createBoss();
                     bossPower=bossPower<50?bossPower+10:bossPower;
                     bossHp=bossHp+(int)(Math.random()*100);

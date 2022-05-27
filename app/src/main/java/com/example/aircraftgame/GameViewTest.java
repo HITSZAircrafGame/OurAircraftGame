@@ -629,6 +629,7 @@ public class GameViewTest extends SurfaceView implements
     public void paint(Canvas cvs){
         //滚动算法
         Log.i("Height",GameActivity.WINDOW_HEIGHT+"");
+        Log.i("ImageHeigh",ImageManager.BACKGROUND_IMAGE.getHeight()+"");
         y1=(y1>=GameActivity.WINDOW_HEIGHT)?y2:y1+GameActivity.WINDOW_HEIGHT/500;
         y2=y1-ImageManager.BACKGROUND_IMAGE.getHeight();
 
