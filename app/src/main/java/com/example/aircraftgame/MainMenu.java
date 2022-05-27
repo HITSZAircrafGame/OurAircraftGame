@@ -55,7 +55,6 @@ public class MainMenu extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-
                     videoOn = true;
                     intent.putExtra("videoIsNeeded",videoOn);
                 } else {
@@ -63,6 +62,5 @@ public class MainMenu extends AppCompatActivity {
                 }
             }
         });
-
     }
 }

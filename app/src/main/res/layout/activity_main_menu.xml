@@ -5,54 +5,85 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainMenu">
+    tools:context=".MainMenu"
+    android:background="@drawable/startbg">
 
     <Button
         android:id="@+id/easyButton"
         android:layout_width="240dp"
         android:layout_height="80dp"
-        android:layout_marginTop="80dp"
+        android:background="@drawable/style_start_button"
         android:text="简单模式"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.578"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.228" />
 
     <Button
         android:id="@+id/mediumButton"
         android:layout_width="240dp"
         android:layout_height="80dp"
-        android:layout_marginTop="40dp"
+        android:background="@drawable/style_start_button"
         android:text="中等模式"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.578"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/easyButton" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.427" />
 
     <Button
         android:id="@+id/hardButton"
         android:layout_width="240dp"
         android:layout_height="80dp"
-        android:layout_marginTop="40dp"
+        android:background="@drawable/style_start_button"
         android:text="困难模式"
-        app:layout_constraintBottom_toTopOf="@+id/videoSwitch"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.578"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mediumButton"
-        app:layout_constraintVertical_bias="0.316"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.632"
         tools:ignore="MissingConstraints" />
 
     <Switch
         android:id="@+id/videoSwitch"
         android:layout_width="130dp"
         android:layout_height="50dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginBottom="120dp"
         android:text="音效:"
-        app:layout_constraintTop_toTopOf="@+id/hardButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.769" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="169dp"
+        android:layout_height="30dp"
+        android:text="尊敬的游客，欢迎您的到来"
+        android:textColor="@color/purple_500"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.066"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请选择游戏的难度和音效"
+        android:textColor="@color/red"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.137" />
 </androidx.constraintlayout.widget.ConstraintLayout>

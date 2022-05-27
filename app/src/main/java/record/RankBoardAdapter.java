@@ -1,7 +1,6 @@
 package record;
 
 import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,12 +9,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.aircraftgame.PlayerRecord;
 import com.example.aircraftgame.R;
 
 import java.util.ArrayList;

@@ -2,9 +2,6 @@ package record;
 
 import android.content.ContentValues;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.example.aircraftgame.PlayerRecord;
 
 import org.litepal.LitePal;
 
