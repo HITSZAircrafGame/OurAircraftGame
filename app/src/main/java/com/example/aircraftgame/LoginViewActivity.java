@@ -2,6 +2,7 @@ package com.example.aircraftgame;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -59,6 +60,7 @@ public class LoginViewActivity extends AppCompatActivity {
         }.start();
     }
 
+    @SuppressLint("HandlerLeak")
     final Handler hand1 = new Handler(){
         @Override
         public void handleMessage(Message msg){

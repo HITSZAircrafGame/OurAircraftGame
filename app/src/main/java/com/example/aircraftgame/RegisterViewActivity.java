@@ -74,6 +74,7 @@ public class RegisterViewActivity extends AppCompatActivity {
         }.start();
     }
 
+    @SuppressLint("HandlerLeak")
     final Handler hand = new Handler(){
         @SuppressLint("HandlerLeak")
         @Override

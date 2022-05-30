@@ -85,7 +85,6 @@ public class GameActivity extends AppCompatActivity {
                 while(!GameOverFlag.gameOverFlag){
                     startService(intent);
                 }
-
                 stopService(intent);
             }).start();
         }
