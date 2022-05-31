@@ -48,6 +48,7 @@ import factory.EnemyFactory;
 import factory.FirePropFactory;
 import factory.MobEnemyFactory;
 import factory.PropFactory;
+import product.enemy.BaseEnemy;
 import product.enemy.BossEnemy;
 import product.enemy.EliteEnemy;
 import product.prop.BaseProp;
@@ -145,6 +146,7 @@ public class GameViewTest extends SurfaceView implements
     /**boss机阈值**/
     protected int bossScore;
 
+
     public GameViewTest(Context context, int screenWidth, int screenHeight) {
 
         super(context);
@@ -171,7 +173,6 @@ public class GameViewTest extends SurfaceView implements
         mSurfaceHolder = this.getHolder();
         mSurfaceHolder.addCallback(this);
         this.setFocusable(true);
-
         //初始化标志和锁
         GameOverFlag.gameOverFlag=false;
         GameBossFlag.flag=false;

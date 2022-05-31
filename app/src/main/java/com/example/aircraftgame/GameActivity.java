@@ -21,7 +21,12 @@ import android.widget.Toast;
 import com.example.aircraftgame.GameDifficulty.DifficultGameView;
 import com.example.aircraftgame.GameDifficulty.EasyGameView;
 import com.example.aircraftgame.GameDifficulty.NormalGameView;
+import com.example.aircraftgame.NetGame.NetGame;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.logging.LogManager;
 
 import MusicPlayer.MusicServer;
@@ -29,6 +34,7 @@ import PublicLockAndFlag.GameBossFlag;
 import PublicLockAndFlag.GameHitFlag;
 import PublicLockAndFlag.GameOverFlag;
 import PublicLockAndFlag.GameSupplyFlag;
+import PublicLockAndFlag.OnlineGameOver;
 import aircraft.HeroAircraft;
 import strategy.StraightShoot;
 
@@ -57,37 +63,9 @@ public class GameActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindowSize();
         setContentView(R.layout.activity_main);
-        switch(GameDifficulty){
-            case 1:
-                Log.i("Game","简单模式");
-                gvt = new EasyGameView(this, WINDOW_WIDTH, WINDOW_HEIGHT);
-                break;
-            case 2:
-                Log.i("Game","普通模式");
-                gvt = new NormalGameView(this, WINDOW_WIDTH, WINDOW_HEIGHT);
-                break;
-            case 3:
-                Log.i("Game","困难模式");
-                gvt = new DifficultGameView(this, WINDOW_WIDTH, WINDOW_HEIGHT);
-                break;
-            default:
-                Log.e("Game","选择错误");
 
-        }
-
-        setContentView(gvt);
-        //设置service播放音乐
-        //新建一条线程来执行
-        if(GameNeedVideo){
-            Log.i("Game","播放音乐");
-            Intent intent=new Intent(this, MusicServer.class);
-            new Thread(()->{
-                while(!GameOverFlag.gameOverFlag){
-                    startService(intent);
-                }
-                stopService(intent);
-            }).start();
-        }
+        new OnlineGame().start();
+//        localGame();
 
     }
 
@@ -120,5 +98,72 @@ public class GameActivity extends AppCompatActivity {
     **/
     public static int getGameDifficulty() {
         return GameDifficulty;
+    }
+
+    /**
+     * 处理联网游戏的逻辑
+     * **/
+    public class OnlineGame extends Thread{
+      @Override
+        public void run(){
+          try{
+              Log.i("OnlineGame","send connection request");
+              Socket socket=new Socket();
+              socket.connect(new InetSocketAddress("192.168.56.1",1111),5000);
+
+              Log.i("OnlineGame","玩家连接完毕");
+            BufferedReader in=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+              Log.i("OnlineGame","waiting connection");
+            if(in.readLine().equals("true")){
+                gvt=new NetGame(GameActivity.this,WINDOW_WIDTH,WINDOW_HEIGHT,socket);
+                gvt = new EasyGameView(GameActivity.this, WINDOW_WIDTH, WINDOW_HEIGHT);
+                setContentView(gvt);
+                startMusic();
+            }
+              Log.i("OnlineGame","网络游戏开始");
+          }catch(Exception e){
+              e.printStackTrace();
+          }
+      }
+    }
+
+    /**本地游戏**/
+    public void localGame(){
+                switch(GameDifficulty){
+            case 1:
+                Log.i("Game","简单模式");
+                gvt = new EasyGameView(this, WINDOW_WIDTH, WINDOW_HEIGHT);
+                break;
+            case 2:
+                Log.i("Game","普通模式");
+                gvt = new NormalGameView(this, WINDOW_WIDTH, WINDOW_HEIGHT);
+                break;
+            case 3:
+                Log.i("Game","困难模式");
+                gvt = new DifficultGameView(this, WINDOW_WIDTH, WINDOW_HEIGHT);
+                break;
+            default:
+                Log.e("Game","选择错误");
+
+        }
+
+        setContentView(gvt);
+        startMusic();
+    }
+
+    /**音乐播放**/
+    public void startMusic(){
+        //设置service播放音乐
+        //新建一条线程来执行
+        if(GameNeedVideo){
+            Log.i("Game","播放音乐");
+            Intent intent=new Intent(this, MusicServer.class);
+            new Thread(()->{
+                while(!GameOverFlag.gameOverFlag){
+                    startService(intent);
+                }
+                stopService(intent);
+            }).start();
+        }
     }
 }

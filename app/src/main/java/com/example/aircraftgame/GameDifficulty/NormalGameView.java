@@ -1,6 +1,7 @@
 package com.example.aircraftgame.GameDifficulty;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.aircraftgame.GameActivity;
 import com.example.aircraftgame.GameViewTest;
@@ -49,11 +50,12 @@ public class NormalGameView extends GameViewTest {
     //难度变化函数
     public void changeDifficulty(){
         if(time%2000==0){
-            rate=(rate<=2)?rate+(Math.random()<0.5?0.1:0.2):rate;
+            rate=(rate<=2)?rate+(Math.random()<0.5?0.1:0.2):2;
         }
 
-         eliteHp = (int)(super.eliteHp*rate); //ver1.0添加，用于设置精英敌机的生命值（随难度变化，目前暂定为60（两次攻击））
-         elitePower = elitePower>20?20:(int)(super.elitePower*rate); //ver2.0添加，精英敌机单个子弹的威力（随难度成比例改变,目前暂定为15）
+         eliteHp = (int)(60*rate); //ver1.0添加，用于设置精英敌机的生命值（随难度变化，目前暂定为60（两次攻击））
+        Log.i("Normal",eliteHp+"");
+        elitePower = elitePower>20?20:(int)(super.elitePower*rate); //ver2.0添加，精英敌机单个子弹的威力（随难度成比例改变,目前暂定为15）
     }
 
 }

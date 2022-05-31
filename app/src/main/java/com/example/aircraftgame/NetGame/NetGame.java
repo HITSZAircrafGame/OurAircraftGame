@@ -9,6 +9,8 @@ import android.util.Log;
 import com.example.aircraftgame.GameDifficulty.DifficultGameView;
 import com.example.aircraftgame.R;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
@@ -16,16 +18,34 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import PublicLockAndFlag.GameOverFlag;
+import PublicLockAndFlag.OnlineGameOver;
+
 //Online Playing Model
 public class NetGame extends DifficultGameView {
     //另一个玩家的分数
     public int score2;
     public Socket socket;
+    public JSONObject playerInfo;
     public NetGame(Context context, int screenWidth, int screenHeight,Socket socket) {
         super(context, screenWidth, screenHeight);
         score2=0;
         this.socket=socket;
+        playerInfo=new JSONObject();
 
+        //初始化JSON
+        try{
+            playerInfo.put("PlayerName","Player");
+            playerInfo.put("Score",score);
+            playerInfo.put("OpponentName","Opponent");
+            playerInfo.put("Score2",score2);
+            playerInfo.put("GameOver",false);//表示该玩家游戏结束
+            playerInfo.put("OnlineDisconnect",false);//表示双方游戏结束，连接断开
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        OnlineGameOver.flag=false;
         //开启服务线程
         new Client(socket).start();
     }
@@ -73,16 +93,35 @@ public class NetGame extends DifficultGameView {
             try{
                 String content;
                 //在双方游戏结束前时刻监听信号
-                while(!((content=in.readLine()).equals("Over"))){
+
+                //发送初始化请求
+                if(GameOverFlag.gameOverFlag){
+                    playerInfo.put("GameOver",true);
+                    Log.i("OnlineGame","Waiting the other player over");
+                }
+                out.println(playerInfo);
+                out.flush();
+
+                while((content=in.readLine())!=null){
+                    Log.i("The Other Player Info",content);
+                    playerInfo=new JSONObject(content);
+
                     //游戏未结束，持续输送信号
-                    Log.i("The Other Player Score",content);
-                    score2=Integer.parseInt(content);
+                    Log.i("The Other Player Score",playerInfo.getInt("Score2")+"");
+                    score2=playerInfo.getInt("Score2");
                     Log.i("Local Player Score",score+"");
-                    out.println(score);
+                    playerInfo.put("Score",score);
+                    if(GameOverFlag.gameOverFlag){
+                        playerInfo.put("GameOver",true);
+                        Log.i("OnlineGame","Waiting the other player over");
+                    }
+                    out.println(playerInfo);
+                    out.flush();
                 }
                 //设置一个双方游戏结束标志
                 //TODO
-
+                playerInfo.put("OnlineDisconnect",true);
+                OnlineGameOver.flag=true;
             }
             catch(Exception e){
                 e.printStackTrace();
