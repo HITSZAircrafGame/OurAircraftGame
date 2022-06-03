@@ -30,6 +30,8 @@ import PublicLockAndFlag.GameHitFlag;
 import PublicLockAndFlag.GameOverFlag;
 import PublicLockAndFlag.GameSupplyFlag;
 import aircraft.HeroAircraft;
+import sp_objects.Laser;
+import sp_objects.Shield;
 import strategy.StraightShoot;
 
 public class GameActivity extends AppCompatActivity {
@@ -95,6 +97,8 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event){
         HeroAircraft.getHeroAircraft(new StraightShoot()).setLocation(event.getX(), event.getY());
+        Shield.getShield(event.getX(), event.getY() - 100);
+        Laser.getLaser(event.getX(), event.getY() - 20);
         return true;
     }
 

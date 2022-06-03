@@ -22,4 +22,5 @@
     <string name="practiceMode">训 练 模 式</string>
     <string name="localPlaying">本 地 游 玩</string>
     <string name="onlinePlaying">在 线 游 玩</string>
+    <string name="title_rank_board">排   行   榜</string>
 </resources>

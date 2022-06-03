@@ -13,16 +13,17 @@
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/drawable/btn_bg_selector.xml" value="0.1695" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/drawable/edit_text_border.xml" value="0.2265" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1725" />
+        <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/drawable/laser_animation.xml" value="0.1425" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_login.xml" value="0.27395833333333336" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_login_view.xml" value="0.264" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_main.xml" value="0.27395833333333336" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_main_menu.xml" value="0.27395833333333336" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_online_menu.xml" value="0.27395833333333336" />
-        <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_rank_board.xml" value="0.25" />
+        <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_rank_board.xml" value="0.264" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_register_view.xml" value="0.264" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_start.xml" value="0.27395833333333336" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/sample_rand_board_view.xml" value="0.27395833333333336" />
-        <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/sample_rank_board_view.xml" value="0.16354166666666667" />
+        <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/sample_rank_board_view.xml" value="0.2" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/view_delete_tip.xml" value="0.2" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/view_record_tip.xml" value="0.25" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2375" />

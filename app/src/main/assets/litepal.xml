@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <litepal>
     <dbname value="GameDataBase"></dbname>
-    <version value="3"></version>
+    <version value="4"></version>
     <list>
         <mapping class="record.PlayerRecord"></mapping>
+        <mapping class="login.Player"></mapping>
     </list>
 </litepal>

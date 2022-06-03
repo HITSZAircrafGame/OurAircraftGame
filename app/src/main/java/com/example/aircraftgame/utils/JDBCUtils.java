@@ -11,18 +11,18 @@ public class JDBCUtils {
 
     private static String dbName = "db_for_myself";
 
-    private static String user = "root";
+    private static String user = "ted";
 
-    private static String password = "zxq1314mm";
+    private static String password = "";
 
     public static Connection getConn(){
         Connection connection = null;
         try{
             Class.forName(driver);
-            String ip = "10.0.2.2";
+            String ip = "10.250.176.199";
 
             connection = DriverManager.getConnection("jdbc:mysql://" + ip +
-                    ":3306/" + dbName,user,password);
+                    ":3306/" + dbName + "?useUnicode=true&characterEncoding=utf-8&useSSL=false",user,password);
         } catch(Exception e) {
             e.printStackTrace();
         }

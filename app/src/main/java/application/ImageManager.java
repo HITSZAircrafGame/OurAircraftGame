@@ -1,13 +1,9 @@
 package application;
 
-
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.view.View;
 
-import com.example.aircraftgame.R;
-
+import bullet.InvisibleBullet;
+import bullet.MagicArrow;
 import product.enemy.BossEnemy;
 import product.prop.BloodProp;
 import product.prop.BombProp;
@@ -17,9 +13,11 @@ import aircraft.HeroAircraft;
 import product.enemy.MobEnemy;
 import bullet.EnemyBullet;
 import bullet.HeroBullet;
+import product.prop.LaserProp;
+import product.prop.ShieldProp;
+import sp_objects.Laser;
+import sp_objects.Shield;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,12 +39,23 @@ public class ImageManager {
     public static Bitmap HERO_IMAGE;
     public static Bitmap HERO_BULLET_IMAGE;
     public static Bitmap ENEMY_BULLET_IMAGE;
+    public static Bitmap INVISIBLE_BULLET_IMAGE;
     public static Bitmap MOB_ENEMY_IMAGE;
-    public static Bitmap ELITE_ENEMY_IMAGE; //ver1.0添加
-    public static Bitmap BOSS_ENEMY_IMAGE; //ver4.0添加
-    public static Bitmap PROP_BLOOD_IMAGE; //ver1.0添加
-    public static Bitmap PROP_BOMB_IMAGE; //ver1.0添加
-    public static Bitmap PROP_BULLET_IMAGE; //ver1.0添加
+    public static Bitmap ELITE_ENEMY_IMAGE;
+    public static Bitmap BOSS_ENEMY_IMAGE;
+    public static Bitmap PROP_BLOOD_IMAGE;
+    public static Bitmap PROP_BOMB_IMAGE;
+    public static Bitmap PROP_BULLET_IMAGE;
+    public static Bitmap PROP_SHIELD_IMAGE;
+    public static Bitmap PROP_LASER_IMAGE;
+    public static Bitmap MAGIC_ARROW_IMAGE;
+    public static Bitmap SHIELD_IMAGE;
+//    public static Bitmap LASER_IMAGE;
+    public static Bitmap LASER_FRAME_ONE_IMAGE;
+    public static Bitmap LASER_FRAME_TWO_IMAGE;
+    public static Bitmap LASER_FRAME_THREE_IMAGE;
+    public static Bitmap LASER_FRAME_FOUR_IMAGE;
+
 
     
 
@@ -68,8 +77,19 @@ public class ImageManager {
         CLASSNAME_IMAGE_MAP.put(BossEnemy.class.getName(), BOSS_ENEMY_IMAGE);
         CLASSNAME_IMAGE_MAP.put(HeroBullet.class.getName(), HERO_BULLET_IMAGE);
         CLASSNAME_IMAGE_MAP.put(EnemyBullet.class.getName(), ENEMY_BULLET_IMAGE);
+        CLASSNAME_IMAGE_MAP.put(InvisibleBullet.class.getName(), INVISIBLE_BULLET_IMAGE);
         CLASSNAME_IMAGE_MAP.put(BloodProp.class.getName(), PROP_BLOOD_IMAGE);
         CLASSNAME_IMAGE_MAP.put(BombProp.class.getName(), PROP_BOMB_IMAGE);
         CLASSNAME_IMAGE_MAP.put(FireProp.class.getName(), PROP_BULLET_IMAGE);
+        CLASSNAME_IMAGE_MAP.put(ShieldProp.class.getName(), PROP_SHIELD_IMAGE);
+        CLASSNAME_IMAGE_MAP.put(LaserProp.class.getName(), PROP_LASER_IMAGE);
+        CLASSNAME_IMAGE_MAP.put(MagicArrow.class.getName(), MAGIC_ARROW_IMAGE);
+        CLASSNAME_IMAGE_MAP.put(Shield.class.getName(), SHIELD_IMAGE);
+//        CLASSNAME_IMAGE_MAP.put(Laser.class.getName(), LASER_IMAGE);
+        CLASSNAME_IMAGE_MAP.put(Laser.class.getName(), LASER_FRAME_ONE_IMAGE);
+        CLASSNAME_IMAGE_MAP.put(Laser.class.getName(), LASER_FRAME_TWO_IMAGE);
+        CLASSNAME_IMAGE_MAP.put(Laser.class.getName(), LASER_FRAME_THREE_IMAGE);
+        CLASSNAME_IMAGE_MAP.put(Laser.class.getName(), LASER_FRAME_FOUR_IMAGE);
+
     }
 }

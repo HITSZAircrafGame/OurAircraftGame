@@ -33,6 +33,7 @@ import PublicLockAndFlag.GameBossFlag;
 import PublicLockAndFlag.GameFireSupplyLock;
 import PublicLockAndFlag.GameHitFlag;
 import PublicLockAndFlag.GameOverFlag;
+import PublicLockAndFlag.GameShieldSupplyLock;
 import PublicLockAndFlag.GameSupplyFlag;
 import PublicLockAndFlag.ShortBgmLock;
 import aircraft.AbstractAircraft;
@@ -46,14 +47,25 @@ import factory.BossEnemyFactory;
 import factory.EliteEnemyFactory;
 import factory.EnemyFactory;
 import factory.FirePropFactory;
+import factory.LaserPropFactory;
 import factory.MobEnemyFactory;
 import factory.PropFactory;
+import factory.ShieldPropFactory;
 import product.enemy.BossEnemy;
 import product.enemy.EliteEnemy;
+import product.enemy.MobEnemy;
 import product.prop.BaseProp;
 import product.prop.BloodProp;
 import product.prop.BombProp;
+import product.prop.FireProp;
+import product.prop.LaserProp;
+import product.prop.ShieldProp;
 import record.ScoreBoard;
+import sp_objects.Laser;
+import sp_objects.Shield;
+import strategy.ArrowShoot;
+import strategy.LaserShoot;
+import strategy.NoShoot;
 import strategy.ScatterShoot;
 import strategy.StraightShoot;
 
@@ -106,6 +118,22 @@ public class GameViewTest extends SurfaceView implements
     protected final PropFactory blpf = new BloodPropFactory(bloodHeal); //ver2.0添加
     protected final PropFactory bopf = new BombPropFactory(); //ver2.0添加
     protected final PropFactory fpf = new FirePropFactory(); //ver2.0添加
+    protected final PropFactory spf = new ShieldPropFactory();
+    protected final PropFactory lpf = new LaserPropFactory();
+
+    /**
+     * 护盾道具对象和护盾道具生效标记
+     * */
+    protected Shield myShield;
+    protected int shieldActive;
+
+    /**
+     * 激光道具对象和激光道具生效标志
+     * */
+    protected Laser laser;
+    protected int laserActive = 0;
+    protected boolean firePropAllowed = true;
+    protected int laserFrameCount = 0; //指明当前是激光动画的第几帧
 
     protected boolean gameOverFlag = false;
     protected int score = 0;
@@ -346,14 +374,59 @@ public class GameViewTest extends SurfaceView implements
     public boolean hook(){
         return false;
     }
+
     /**
      * 碰撞检测：
      * 1. 敌机攻击英雄
      * 2. 英雄攻击/撞击敌机
      * 3. 英雄获得补给
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     protected void crashCheckAction() {
-        // TODO 敌机子弹攻击英雄
+
+        //护盾碰撞检测
+        shieldCrashCheckAction();
+
+//        //激光碰撞检测
+//        laserCrashCheckAction();
+
+
+        //子弹碰撞检测
+        bulletCrashCheckAction();
+
+        for (BaseProp prop : props){
+            //二次拾取道具无效
+            if (prop.notValid()){
+                continue;
+            }
+            if (heroAircraft.crash(prop)){
+                synchronized(ShortBgmLock.lock){
+                    GameSupplyFlag.flag=true;
+                }
+                if (prop instanceof BloodProp){
+                    resBloodPropActive(prop);
+                } else if (prop instanceof BombProp){
+                    resBombPropActive(prop);
+                } else if (prop instanceof FireProp && firePropAllowed) {
+                    resFirePropActive();
+                } else if (prop instanceof ShieldProp) {
+                    resShieldPropActive();
+                } else if (prop instanceof LaserProp) {
+                    resLaserPropActive();
+                }
+                prop.vanish();
+            }
+        }
+        if(isBomb){
+            createTool();
+            isBomb=false;
+        }
+    }
+
+    /**
+     * 子弹碰撞生效函数
+     * **/
+    private void bulletCrashCheckAction(){
         for (BaseBullet bullet : enemyBullets) {
             if (bullet.notValid()) {
                 continue;
@@ -384,24 +457,7 @@ public class GameViewTest extends SurfaceView implements
                     // 敌机损失一定生命值
                     enemyAircraft.decreaseHp(bullet.getPower());
                     bullet.vanish();
-                    if (enemyAircraft.notValid()) {
-                        // TODO 获得分数，产生道具补给
-                        if (enemyAircraft instanceof EliteEnemy){  //如果是精英敌机，则击破加分更多，且有几率爆出强化道具
-                            score += 50;
-                            scoreBound += 50;
-                            createEliteProps(enemyAircraft);
-                        } else if (enemyAircraft instanceof BossEnemy) { //如果是boss敌机，加分最多，必爆三种道具
-                            score += 100;
-                            bossAlreadyExist = false;
-                            GameBossFlag.flag=false;
-                            scoreBound = 0;
-                            createBossProp(enemyAircraft);
-
-                        } else {
-                            score += 10;
-                            scoreBound += 10;
-                        }
-                    }
+                    resEnemyFalling(enemyAircraft);
                 }
                 // 英雄机 与 敌机 相撞，均损毁
                 if (enemyAircraft.crash(heroAircraft) || heroAircraft.crash(enemyAircraft)) {
@@ -410,76 +466,235 @@ public class GameViewTest extends SurfaceView implements
                 }
             }
         }
-
-        // Todo: 我方获得道具，道具生效
-        for (BaseProp prop : props){
-            //二次拾取道具无效
-            if (prop.notValid()){
-                continue;
-            }
-            if (heroAircraft.crash(prop)){
-                synchronized(ShortBgmLock.lock){
-                    GameSupplyFlag.flag=true;
-                }
-                if (prop instanceof BloodProp){
-                    heroAircraft.setHp(heroAircraft.getHp() + ((BloodProp) prop).getBloodHeal());
-                } else if (prop instanceof BombProp){
-                    synchronized (ShortBgmLock.lock){
-                        GameBombFlag.flag=true;
-                    }
-                    bombActive(prop);
-                    isBomb=true;
-                    System.out.println("BombSupply active!");
-                } else {
-                    synchronized (GameFireSupplyLock.lock1){
-                        fireActive++;
-                    }
-                    if(fireActive<=5){
-                        Log.i("Fire","Fire supply start");
-                        heroAircraft.setShootWay(new ScatterShoot());
-                        Runnable r=()->{
-                            int lastFireActive;
-                            lastFireActive=fireActive;
-                            synchronized (GameFireSupplyLock.lock){
-                                if(heroAircraft.getShootNum() < 3) { //最多3发子弹散射
-                                    heroAircraft.setShootNum(heroAircraft.getShootNum() + 1);
-                                    System.out.println("FireSupply active!");
-                                } else {
-                                    System.out.println("Now nobody can beat you!");
-                                }
-                            }
-                            //道具生效10ms
-                            try{
-                                Thread.sleep(10000);
-                            }
-                            catch(Exception e){
-                                e.printStackTrace();
-                            }
-
-                            //火力道具效果结束
-                            if(lastFireActive==fireActive||lastFireActive==5){
-                                synchronized (GameFireSupplyLock.lock1) {
-                                    fireActive = 0;
-                                    heroAircraft.setShootWay(new StraightShoot());
-                                    heroAircraft.setShootNum(1);
-                                    Log.i("Fire", "Fire supply over");
-                                }
-                            }
-                        };
-                        new Thread(r).start();
-                    }
-                }
-                prop.vanish();
-            }
-        }
-
-        if(isBomb){
-            createTool();
-            isBomb=false;
-        }
-
     }
 
+    /**
+     * 护盾碰撞生效函数
+     * */
+    private void shieldCrashCheckAction(){
+        if (myShield != null) {
+            for (BaseBullet bullet : enemyBullets) {
+                if (bullet.crash(myShield)) {
+                    bullet.vanish();
+                }
+            }
+            for (AbstractAircraft enemyAircraft : enemyAircrafts) {
+                if (enemyAircraft.crash(myShield) && enemyAircraft instanceof MobEnemy) {
+                    enemyAircraft.vanish();
+                    score += 10;
+                    scoreBound += 10;
+                }
+            }
+        }
+    }
+
+//    /**
+//     * 激光碰撞生效函数
+//     * **/
+//    @RequiresApi(api = Build.VERSION_CODES.N)
+//    public void laserCrashCheckAction(){
+//        if (laser != null) {
+//            for (AbstractAircraft enemyAircraft : enemyAircrafts) {
+//                if (laser != null && enemyAircraft.crash(laser)) {
+//                    enemyAircraft.decreaseHp(200);
+//                    resEnemyFalling(enemyAircraft);
+//                }
+//            }
+//        }
+//    }
+
+    /**
+     * 敌机被击落时的反响函数，得分（或积分）增加，道具掉落
+     * **/
+    private void resEnemyFalling(AbstractAircraft enemyAircraft){
+        if (enemyAircraft.notValid()) {
+            if (enemyAircraft instanceof EliteEnemy){  //如果是精英敌机，则击破加分更多，且有几率爆出强化道具
+                score += 50;
+                scoreBound += 50;
+                createEliteProps(enemyAircraft);
+            } else if (enemyAircraft instanceof BossEnemy) { //如果是boss敌机，加分最多，必爆多种道具
+                score += 100;
+                bossAlreadyExist = false;
+                GameBossFlag.flag=false;
+                scoreBound = 0;
+                createBossProp(enemyAircraft);
+            } else {
+                score += 10;
+                scoreBound += 10;
+            }
+        }
+    }
+
+    /**
+     * 治疗道具生效反响函数
+     * **/
+    private void resBloodPropActive(BaseProp prop){
+        heroAircraft.setHp(heroAircraft.getHp() + ((BloodProp) prop).getBloodHeal());
+    }
+
+    /**
+     * 炸弹道具生效反响函数
+     * **/
+    private void resBombPropActive(BaseProp prop){
+        synchronized (ShortBgmLock.lock){
+            GameBombFlag.flag=true;
+        }
+        bombActive(prop);
+        isBomb=true;
+        System.out.println("BombSupply active!");
+    }
+
+    /**
+     * 火力道具生效反响函数
+     * **/
+    private void resFirePropActive(){
+        synchronized (GameFireSupplyLock.lock1) {
+            fireActive++;
+        }
+        if (fireActive <= 5) {
+            Log.i("Fire", "Fire supply start");
+            double rate = Math.random();
+            if (rate < 0.5f) {
+                resScatterShootActive();
+            } else {
+                resMagicArrowActive();
+            }
+        }
+    }
+
+    /**
+     * 散射生效反响函数
+     * **/
+    private void resScatterShootActive(){
+        heroAircraft.setShootWay(new ScatterShoot());
+        Runnable r = () -> {
+
+            int lastFireActive;
+            lastFireActive = fireActive;
+            synchronized (GameFireSupplyLock.lock) {
+                if (heroAircraft.getShootNum() < 3) { //最多3发子弹散射
+                    heroAircraft.setShootNum(heroAircraft.getShootNum() + 1);
+                    System.out.println("FireSupply active!");
+                } else {
+                    System.out.println("Now nobody can beat you!");
+                }
+            }
+            //道具生效10ms
+            try {
+                Thread.sleep(10000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            //火力道具效果结束
+            resFirePropOver(lastFireActive);
+        };
+        new Thread(r).start();
+    }
+
+    /**
+     * 魔法箭生效反响函数
+     * **/
+    private void resMagicArrowActive(){
+        //魔法箭弹道
+        Runnable r = () -> {
+
+            int lastFireActive;
+            lastFireActive = fireActive;
+            synchronized (GameFireSupplyLock.lock) {
+                heroAircraft.setShootWay(new ArrowShoot());
+            }
+            try {
+                Thread.sleep(10000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            resFirePropOver(lastFireActive);
+        };
+        new Thread(r).start();
+    }
+
+    /**
+     * 火力道具结束反响函数
+     * **/
+    private void resFirePropOver(int lastFireActive){
+        if (lastFireActive == fireActive || lastFireActive == 5) {
+            synchronized (GameFireSupplyLock.lock1) {
+                fireActive = 0;
+                heroAircraft.setShootWay(new StraightShoot());
+                heroAircraft.setShootNum(1);
+                Log.i("Fire", "Fire supply over");
+            }
+        }
+    }
+
+    /**
+     * 护盾道具生效反响函数
+     * **/
+    private void resShieldPropActive(){
+        synchronized (GameShieldSupplyLock.lock) {
+            shieldActive++;
+        }
+        if (shieldActive <= 5) {
+            Log.i("Shield", "Shield supply start!");
+            myShield = Shield.getShield(heroAircraft.getLocationX(),
+                    heroAircraft.getLocationY() - 100);
+            Runnable r = () -> {
+                int lastShieldActive;
+                lastShieldActive = shieldActive;
+
+                try {
+                    Thread.sleep(10000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (lastShieldActive == shieldActive || lastShieldActive == 5) {
+                    shieldActive = 0;
+                    myShield = null;
+                    Log.i("Shield", "Shield supply over!");
+                }
+            };
+            new Thread(r).start();
+        }
+    }
+
+    /**
+     * 激光道具生效反响函数
+     * **/
+    private void resLaserPropActive(){
+        synchronized (GameShieldSupplyLock.lock) {
+            laserActive++;
+        }
+        if (laserActive <= 3) {
+            Log.i("Laser", "Laser supply start!");
+            laser = Laser.getLaser(heroAircraft.getLocationX(),
+                    heroAircraft.getLocationY() - 20);
+            heroAircraft.setShootWay(new LaserShoot());
+            firePropAllowed = false;
+            Runnable r = () -> {
+                int lastLaserActive;
+                lastLaserActive = laserActive;
+
+                try {
+                    Thread.sleep(8000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (lastLaserActive == laserActive || lastLaserActive == 3) {
+                    laserActive = 0;
+                    laser = null;
+                    heroAircraft.setShootWay(new StraightShoot());
+                    heroAircraft.setShootNum(1);
+                    firePropAllowed = true;
+                    laserFrameCount = 0;
+                    Log.i("Laser", "Laser supply over!");
+                }
+            };
+            new Thread(r).start();
+        }
+    }
 
     /**
      * 炸弹生效函数
@@ -492,8 +707,6 @@ public class GameViewTest extends SurfaceView implements
 
         //唤醒观察者
         score+=tool.notifyAllObserver();
-
-
     }
 
     /**
@@ -515,24 +728,34 @@ public class GameViewTest extends SurfaceView implements
     }
 
     /**
-     * 道具生辰逻辑
+     * 道具生成逻辑
      * **/
     public void createEliteProps(AbstractAircraft enemyAircraft){
         Random r = new Random();
         if(Math.random() < propOccur && props.size() < propMaxNumber){
-            if(r.nextFloat() < 0.4f){
+            if(r.nextFloat() < 0.2f){
                 props.add(blpf.createProp(enemyAircraft.getLocationX(),
                         enemyAircraft.getLocationY(),
                         (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
                         6*GameActivity.WINDOW_HEIGHT/700)
                 );
-            } else if(r.nextFloat() < 0.8f){
+            } else if(r.nextFloat() < 0.4f){
                 props.add(fpf.createProp(enemyAircraft.getLocationX(),
                         enemyAircraft.getLocationY(),
                         (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
                         6*GameActivity.WINDOW_HEIGHT/700)
                 );
-            } else{
+            } else if (r.nextFloat() < 0.6f){
+                props.add(spf.createProp(enemyAircraft.getLocationX(),
+                        enemyAircraft.getLocationY(),
+                        (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                        6*GameActivity.WINDOW_HEIGHT/700));
+            } else if (r.nextFloat() < 0.8f) {
+                props.add(lpf.createProp(enemyAircraft.getLocationX(),
+                        enemyAircraft.getLocationY(),
+                        (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                        6*GameActivity.WINDOW_HEIGHT/700));
+            } else {
                 props.add(bopf.createProp(enemyAircraft.getLocationX(),
                         enemyAircraft.getLocationY(),
                         (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
@@ -565,6 +788,15 @@ public class GameViewTest extends SurfaceView implements
                 (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
                 6*GameActivity.WINDOW_HEIGHT/700)
         );
+        props.add(spf.createProp(x-5+(Math.random()<0.5?1:-1)*(int)(Math.random()*GameActivity.WINDOW_WIDTH/10),
+                y-10+(int)(Math.random()*GameActivity.WINDOW_HEIGHT/20),
+                (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                6*GameActivity.WINDOW_HEIGHT/700)
+        );
+        props.add(lpf.createProp(x-5+(Math.random()<0.5?1:-1)*(int)(Math.random()*GameActivity.WINDOW_WIDTH/10),
+                y-10+(int)(Math.random()*GameActivity.WINDOW_HEIGHT/20),
+                (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                6*GameActivity.WINDOW_HEIGHT/700));
     }
 
     /**
@@ -588,7 +820,7 @@ public class GameViewTest extends SurfaceView implements
      * */
     protected void recordTime() {
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         recordedtime = sdf.format(date);
     }
 
@@ -643,11 +875,61 @@ public class GameViewTest extends SurfaceView implements
         paintImageWithPositionRevised(cvs, enemyAircrafts);
         paintImageWithPositionRevised(cvs, props);
 
-        cvs.drawBitmap(ImageManager.HERO_IMAGE, heroAircraft.getLocationX() - ImageManager.HERO_IMAGE.getWidth() / 2,
+        cvs.drawBitmap(ImageManager.HERO_IMAGE,
+                heroAircraft.getLocationX() - ImageManager.HERO_IMAGE.getWidth() / 2,
                 heroAircraft.getLocationY() - ImageManager.HERO_IMAGE.getHeight() / 2, mPaint);
 
+        if (myShield != null){
+            cvs.drawBitmap(ImageManager.SHIELD_IMAGE,
+                    myShield.getLocationX() - ImageManager.SHIELD_IMAGE.getWidth() / 2,
+                    myShield.getLocationY() - ImageManager.SHIELD_IMAGE.getHeight() / 2, mPaint);
+        }
+
+        laserFrameAni(cvs);
+
+//        if (laser != null){
+//            cvs.drawBitmap(ImageManager.LASER_IMAGE,
+//                    laser.getLocationX() - ImageManager.LASER_IMAGE.getWidth() / 2,
+//                    laser.getLocationY() - ImageManager.LASER_IMAGE.getHeight(), mPaint);
+//        }
         //绘制得分和生命值
         paintScoreAndLife(cvs);
+    }
+
+    /***
+     * 利用surfaceView的paint的原理按帧绘制激光的动画
+     * 一共是4帧
+     * */
+    private void laserFrameAni(Canvas cvs){
+        if(laser != null) {
+             if (laserFrameCount < 2) {
+                 cvs.drawBitmap(ImageManager.LASER_FRAME_ONE_IMAGE,
+                         laser.getLocationX() - ImageManager.LASER_FRAME_ONE_IMAGE.getWidth() / 2,
+                         laser.getLocationY() - ImageManager.LASER_FRAME_ONE_IMAGE.getHeight(), mPaint);
+                 laserFrameCount++;
+
+             } else if (laserFrameCount < 4) {
+                 cvs.drawBitmap(ImageManager.LASER_FRAME_TWO_IMAGE,
+                         laser.getLocationX() - ImageManager.LASER_FRAME_TWO_IMAGE.getWidth() / 2,
+                         laser.getLocationY() - ImageManager.LASER_FRAME_TWO_IMAGE.getHeight(), mPaint);
+                 laserFrameCount++;
+
+             } else if (laserFrameCount < 6) {
+                 cvs.drawBitmap(ImageManager.LASER_FRAME_THREE_IMAGE,
+                         laser.getLocationX() - ImageManager.LASER_FRAME_THREE_IMAGE.getWidth() / 2,
+                         laser.getLocationY() - ImageManager.LASER_FRAME_THREE_IMAGE.getHeight(), mPaint);
+                 laserFrameCount++;
+
+             } else if (laserFrameCount < 8) {
+                 cvs.drawBitmap(ImageManager.LASER_FRAME_FOUR_IMAGE,
+                         laser.getLocationX() - ImageManager.LASER_FRAME_FOUR_IMAGE.getWidth() / 2,
+                         laser.getLocationY() - ImageManager.LASER_FRAME_FOUR_IMAGE.getHeight(), mPaint);
+                 laserFrameCount++;
+                 if (laserFrameCount == 8) {
+                     laserFrameCount = 0;
+                 }
+             }
+        }
     }
 
     protected void paintImageWithPositionRevised(Canvas cvs, List<? extends AbstractFlyingObject> objects) {
@@ -691,11 +973,20 @@ public class GameViewTest extends SurfaceView implements
             ImageManager.MOB_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.mob);
             ImageManager.ELITE_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.elite);
             ImageManager.BOSS_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.boss);
-            ImageManager.HERO_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_hero);
-            ImageManager.ENEMY_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_enemy);
+            ImageManager.HERO_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_hero2);
+            ImageManager.ENEMY_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_enemy2);
+            ImageManager.INVISIBLE_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_invisible);
             ImageManager.PROP_BLOOD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_blood);
             ImageManager.PROP_BOMB_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_bomb);
             ImageManager.PROP_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_bullet);
+            ImageManager.PROP_SHIELD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_shield);
+            ImageManager.PROP_LASER_IMAGE = BitmapFactory.decodeResource(getResources(),R.drawable.prop_laser);
+            ImageManager.MAGIC_ARROW_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_magic_arrow);
+            ImageManager.SHIELD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.shield);
+            ImageManager.LASER_FRAME_ONE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser1);
+            ImageManager.LASER_FRAME_TWO_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser2);
+            ImageManager.LASER_FRAME_THREE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser3);
+            ImageManager.LASER_FRAME_FOUR_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser4);
 
             ImageManager.setUpClassnameImageMap();
         } catch (Exception e) {
