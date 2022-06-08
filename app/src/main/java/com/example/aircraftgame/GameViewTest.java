@@ -22,8 +22,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -32,6 +35,7 @@ import PublicLockAndFlag.GameBombFlag;
 import PublicLockAndFlag.GameBossFlag;
 import PublicLockAndFlag.GameFireSupplyLock;
 import PublicLockAndFlag.GameHitFlag;
+import PublicLockAndFlag.GameLaserSupplyLock;
 import PublicLockAndFlag.GameOverFlag;
 import PublicLockAndFlag.GameShieldSupplyLock;
 import PublicLockAndFlag.GameSupplyFlag;
@@ -41,6 +45,7 @@ import aircraft.HeroAircraft;
 import application.ImageManager;
 import basic.AbstractFlyingObject;
 import bullet.BaseBullet;
+import bullet.InvisibleBullet;
 import factory.BloodPropFactory;
 import factory.BombPropFactory;
 import factory.BossEnemyFactory;
@@ -61,6 +66,7 @@ import product.prop.FireProp;
 import product.prop.LaserProp;
 import product.prop.ShieldProp;
 import record.ScoreBoard;
+import sp_objects.BombEffect;
 import sp_objects.Laser;
 import sp_objects.Shield;
 import strategy.ArrowShoot;
@@ -135,6 +141,11 @@ public class GameViewTest extends SurfaceView implements
     protected boolean firePropAllowed = true;
     protected int laserFrameCount = 0; //指明当前是激光动画的第几帧
 
+    /**
+     * 炸弹爆炸对象集合以及相关变量
+     * */
+    protected List<BombEffect> bombEffects = new LinkedList<>();
+
     protected boolean gameOverFlag = false;
     protected int score = 0;
     protected String recordedtime;
@@ -160,6 +171,7 @@ public class GameViewTest extends SurfaceView implements
      * **/
 
     protected int fireActive;
+    protected Thread fireThread;
 
     /**
      * 炸弹是否生效
@@ -172,6 +184,9 @@ public class GameViewTest extends SurfaceView implements
 
     /**boss机阈值**/
     protected int bossScore;
+
+    /**积分**/
+    protected int bonus;
 
     public GameViewTest(Context context, int screenWidth, int screenHeight) {
 
@@ -387,10 +402,6 @@ public class GameViewTest extends SurfaceView implements
         //护盾碰撞检测
         shieldCrashCheckAction();
 
-//        //激光碰撞检测
-//        laserCrashCheckAction();
-
-
         //子弹碰撞检测
         bulletCrashCheckAction();
 
@@ -456,7 +467,9 @@ public class GameViewTest extends SurfaceView implements
                     // 敌机撞击到英雄机子弹
                     // 敌机损失一定生命值
                     enemyAircraft.decreaseHp(bullet.getPower());
-                    bullet.vanish();
+                    if(!(bullet instanceof InvisibleBullet)) {
+                        bullet.vanish();
+                    }
                     resEnemyFalling(enemyAircraft);
                 }
                 // 英雄机 与 敌机 相撞，均损毁
@@ -488,21 +501,6 @@ public class GameViewTest extends SurfaceView implements
         }
     }
 
-//    /**
-//     * 激光碰撞生效函数
-//     * **/
-//    @RequiresApi(api = Build.VERSION_CODES.N)
-//    public void laserCrashCheckAction(){
-//        if (laser != null) {
-//            for (AbstractAircraft enemyAircraft : enemyAircrafts) {
-//                if (laser != null && enemyAircraft.crash(laser)) {
-//                    enemyAircraft.decreaseHp(200);
-//                    resEnemyFalling(enemyAircraft);
-//                }
-//            }
-//        }
-//    }
-
     /**
      * 敌机被击落时的反响函数，得分（或积分）增加，道具掉落
      * **/
@@ -510,10 +508,12 @@ public class GameViewTest extends SurfaceView implements
         if (enemyAircraft.notValid()) {
             if (enemyAircraft instanceof EliteEnemy){  //如果是精英敌机，则击破加分更多，且有几率爆出强化道具
                 score += 50;
+                bonus += 1;
                 scoreBound += 50;
                 createEliteProps(enemyAircraft);
-            } else if (enemyAircraft instanceof BossEnemy) { //如果是boss敌机，加分最多，必爆多种道具
+            } else if (enemyAircraft instanceof BossEnemy) { //如果是boss敌机，加分最多，必爆多种道具，并且可以获得积分
                 score += 100;
+                bonus += 10;
                 bossAlreadyExist = false;
                 GameBossFlag.flag=false;
                 scoreBound = 0;
@@ -539,6 +539,7 @@ public class GameViewTest extends SurfaceView implements
         synchronized (ShortBgmLock.lock){
             GameBombFlag.flag=true;
         }
+        bombEffects.add(new BombEffect());
         bombActive(prop);
         isBomb=true;
         System.out.println("BombSupply active!");
@@ -583,13 +584,17 @@ public class GameViewTest extends SurfaceView implements
             try {
                 Thread.sleep(10000);
             } catch (Exception e) {
+                fireThread = null;
+                fireActive = 0;
                 e.printStackTrace();
             }
 
             //火力道具效果结束
             resFirePropOver(lastFireActive);
         };
-        new Thread(r).start();
+        fireThread = new Thread(r);
+        fireThread.start();
+//        new Thread(r).start();
     }
 
     /**
@@ -607,11 +612,15 @@ public class GameViewTest extends SurfaceView implements
             try {
                 Thread.sleep(10000);
             } catch (Exception e) {
+                fireThread = null;
+                fireActive = 0;
                 e.printStackTrace();
             }
             resFirePropOver(lastFireActive);
         };
-        new Thread(r).start();
+        fireThread = new Thread(r);
+        fireThread.start();
+//        new Thread(r).start();
     }
 
     /**
@@ -620,6 +629,7 @@ public class GameViewTest extends SurfaceView implements
     private void resFirePropOver(int lastFireActive){
         if (lastFireActive == fireActive || lastFireActive == 5) {
             synchronized (GameFireSupplyLock.lock1) {
+                fireThread = null;
                 fireActive = 0;
                 heroAircraft.setShootWay(new StraightShoot());
                 heroAircraft.setShootNum(1);
@@ -663,7 +673,10 @@ public class GameViewTest extends SurfaceView implements
      * 激光道具生效反响函数
      * **/
     private void resLaserPropActive(){
-        synchronized (GameShieldSupplyLock.lock) {
+        if (fireThread != null){
+            fireThread.interrupt();
+        }
+        synchronized (GameLaserSupplyLock.lock) {
             laserActive++;
         }
         if (laserActive <= 3) {
@@ -683,8 +696,8 @@ public class GameViewTest extends SurfaceView implements
                 }
 
                 if (lastLaserActive == laserActive || lastLaserActive == 3) {
-                    laserActive = 0;
                     laser = null;
+                    laserActive = 0;
                     heroAircraft.setShootWay(new StraightShoot());
                     heroAircraft.setShootNum(1);
                     firePropAllowed = true;
@@ -879,19 +892,19 @@ public class GameViewTest extends SurfaceView implements
                 heroAircraft.getLocationX() - ImageManager.HERO_IMAGE.getWidth() / 2,
                 heroAircraft.getLocationY() - ImageManager.HERO_IMAGE.getHeight() / 2, mPaint);
 
+        //绘制护盾特效
         if (myShield != null){
             cvs.drawBitmap(ImageManager.SHIELD_IMAGE,
                     myShield.getLocationX() - ImageManager.SHIELD_IMAGE.getWidth() / 2,
                     myShield.getLocationY() - ImageManager.SHIELD_IMAGE.getHeight() / 2, mPaint);
         }
 
+        //绘制激光动画
         laserFrameAni(cvs);
 
-//        if (laser != null){
-//            cvs.drawBitmap(ImageManager.LASER_IMAGE,
-//                    laser.getLocationX() - ImageManager.LASER_IMAGE.getWidth() / 2,
-//                    laser.getLocationY() - ImageManager.LASER_IMAGE.getHeight(), mPaint);
-//        }
+        //绘制爆炸动画
+        bombFrameAni(cvs);
+
         //绘制得分和生命值
         paintScoreAndLife(cvs);
     }
@@ -902,33 +915,37 @@ public class GameViewTest extends SurfaceView implements
      * */
     private void laserFrameAni(Canvas cvs){
         if(laser != null) {
-             if (laserFrameCount < 2) {
-                 cvs.drawBitmap(ImageManager.LASER_FRAME_ONE_IMAGE,
-                         laser.getLocationX() - ImageManager.LASER_FRAME_ONE_IMAGE.getWidth() / 2,
-                         laser.getLocationY() - ImageManager.LASER_FRAME_ONE_IMAGE.getHeight(), mPaint);
-                 laserFrameCount++;
+            Bitmap laserFrame = ImageManager.LASER_FRAMES.get(laserFrameCount / 2);
+            cvs.drawBitmap(laserFrame,
+                    laser.getLocationX() - laserFrame.getWidth() / 2,
+                    laser.getLocationY() - laserFrame.getHeight(), mPaint);
+            laserFrameCount++;
+            if(laserFrameCount == 8){
+                laserFrameCount = 0;
+            }
+        }
+    }
 
-             } else if (laserFrameCount < 4) {
-                 cvs.drawBitmap(ImageManager.LASER_FRAME_TWO_IMAGE,
-                         laser.getLocationX() - ImageManager.LASER_FRAME_TWO_IMAGE.getWidth() / 2,
-                         laser.getLocationY() - ImageManager.LASER_FRAME_TWO_IMAGE.getHeight(), mPaint);
-                 laserFrameCount++;
-
-             } else if (laserFrameCount < 6) {
-                 cvs.drawBitmap(ImageManager.LASER_FRAME_THREE_IMAGE,
-                         laser.getLocationX() - ImageManager.LASER_FRAME_THREE_IMAGE.getWidth() / 2,
-                         laser.getLocationY() - ImageManager.LASER_FRAME_THREE_IMAGE.getHeight(), mPaint);
-                 laserFrameCount++;
-
-             } else if (laserFrameCount < 8) {
-                 cvs.drawBitmap(ImageManager.LASER_FRAME_FOUR_IMAGE,
-                         laser.getLocationX() - ImageManager.LASER_FRAME_FOUR_IMAGE.getWidth() / 2,
-                         laser.getLocationY() - ImageManager.LASER_FRAME_FOUR_IMAGE.getHeight(), mPaint);
-                 laserFrameCount++;
-                 if (laserFrameCount == 8) {
-                     laserFrameCount = 0;
-                 }
-             }
+    /***
+     * 利用surfaceView的paint的原理按帧绘制炸弹爆炸的动画
+     * 一共是9帧
+     * */
+    protected void bombFrameAni(Canvas cvs){
+        if(bombEffects.size() != 0) {
+            Bitmap tempFrame;
+            int tempFrameCount;
+            for (int i = 0; i < bombEffects.size(); i++) {
+                tempFrameCount = bombEffects.get(i).getBombEffFrame();
+                if(tempFrameCount == 9){
+                    bombEffects.remove(i--);
+                    continue;
+                }
+                tempFrame = ImageManager.BOMB_FRAMES.get(tempFrameCount);
+                cvs.drawBitmap(tempFrame,
+                        GameActivity.WINDOW_WIDTH / 2 - tempFrame.getWidth() / 2,
+                        GameActivity.WINDOW_HEIGHT / 2 - tempFrame.getHeight() / 2, mPaint);
+                bombEffects.get(i).frameAdd();
+            }
         }
     }
 
@@ -949,44 +966,34 @@ public class GameViewTest extends SurfaceView implements
     protected void paintScoreAndLife(Canvas cvs) {
         int x = 10;
         int y = 100;
-        mPaint.setColor(R.color.red);
         mPaint.setTypeface(Typeface.create(Typeface.SANS_SERIF,Typeface.BOLD));
         mPaint.setTextSize(100);
         cvs.drawText("SCORE:" + this.score, x, y, mPaint);
         y = y + 100;
         cvs.drawText("LIFE:" + this.heroAircraft.getHp(), x, y, mPaint);
+        y = y + 20;
+        cvs.drawBitmap(ImageManager.MIPMAP_BONUS_IMAGE, x, y, mPaint);
+        y = y + 85;
+        x = x + 140;
+        cvs.drawText("" + this.bonus, x, y, mPaint);
     }
 
+    /**
+     * 加载图片的方法，设为空方法让子类不同难度予以覆写
+     **/
     public void loadImages() {
         try {
-            if(GameActivity.getGameDifficulty()==1){
-                ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg);
+            loadImagesByDiff();
+            loadHeroImages();
+            //需要Boss机才加载图片
+            if(hook()) {
+                loadBossImages();
             }
-            else if(GameActivity.getGameDifficulty()==2){
-                ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg2);
-            }
-            else{
-                ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg3);
-            }
-
-            ImageManager.HERO_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.hero);
-            ImageManager.MOB_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.mob);
-            ImageManager.ELITE_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.elite);
-            ImageManager.BOSS_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.boss);
-            ImageManager.HERO_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_hero2);
-            ImageManager.ENEMY_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_enemy2);
-            ImageManager.INVISIBLE_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_invisible);
-            ImageManager.PROP_BLOOD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_blood);
-            ImageManager.PROP_BOMB_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_bomb);
-            ImageManager.PROP_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_bullet);
-            ImageManager.PROP_SHIELD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_shield);
-            ImageManager.PROP_LASER_IMAGE = BitmapFactory.decodeResource(getResources(),R.drawable.prop_laser);
-            ImageManager.MAGIC_ARROW_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_magic_arrow);
-            ImageManager.SHIELD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.shield);
-            ImageManager.LASER_FRAME_ONE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser1);
-            ImageManager.LASER_FRAME_TWO_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser2);
-            ImageManager.LASER_FRAME_THREE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser3);
-            ImageManager.LASER_FRAME_FOUR_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser4);
+            loadSpeObjImages();
+            loadCommonBulletImages();
+            loadPropImages();
+            loadLaserAniImages();
+            loadBombAniImages();
 
             ImageManager.setUpClassnameImageMap();
         } catch (Exception e) {
@@ -994,4 +1001,93 @@ public class GameViewTest extends SurfaceView implements
             System.exit(-1);
         }
     }
+
+    /**
+     * 加载随难度变化的图片，为空，由子类覆写
+     * */
+    protected void loadImagesByDiff(){
+    }
+
+    /**
+     * 加载英雄机图片，有扩展在此新增
+     * */
+    protected void loadHeroImages(){
+        ImageManager.HERO_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.hero2);
+    }
+
+    /**
+     * 加载Boss机图片，有扩展在此新增
+     * */
+    protected void loadBossImages(){
+        ImageManager.BOSS_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.boss);
+    }
+
+    /**
+     * 加载特殊物体的图片，有扩展在此新增
+     * */
+    protected void loadSpeObjImages(){
+        ImageManager.SHIELD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.shield);
+        ImageManager.MIPMAP_BONUS_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bonus);
+    }
+
+    /**
+     * 加载不随难度变化的子弹所需的图片，有扩展在此新增
+     * */
+    protected void loadCommonBulletImages(){
+        ImageManager.HERO_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_hero2);
+        ImageManager.INVISIBLE_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_invisible);
+        ImageManager.MAGIC_ARROW_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_magic_arrow);
+    }
+
+    /**
+     * 加载道具所需的图片,有扩展在此新增
+     * */
+    protected void loadPropImages(){
+        ImageManager.PROP_BLOOD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_blood);
+        ImageManager.PROP_BOMB_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_bomb);
+        ImageManager.PROP_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_bullet);
+        ImageManager.PROP_SHIELD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_shield);
+        ImageManager.PROP_LASER_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.prop_laser);
+    }
+
+    /**
+     * 加载激光动画所需的图片
+     * */
+    protected void loadLaserAniImages(){
+        ImageManager.LASER_FRAMES = new ArrayList<>();
+        ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser1));
+        ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser2));
+        ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser3));
+        ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser4));
+//        ImageManager.LASER_FRAME_ONE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser1);
+//        ImageManager.LASER_FRAME_TWO_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser2);
+//        ImageManager.LASER_FRAME_THREE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser3);
+//        ImageManager.LASER_FRAME_FOUR_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser4);
+    }
+
+    /**
+     * 加载爆炸动画所需图片
+     * */
+    protected void loadBombAniImages(){
+        ImageManager.BOMB_FRAMES = new ArrayList<>();
+        ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani1));
+        ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani2));
+        ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani3));
+        ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani4));
+        ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani5));
+        ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani6));
+        ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani7));
+        ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani8));
+        ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani9));
+//        ImageManager.BOMB_FRAME_ONE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani1);
+//        ImageManager.BOMB_FRAME_TWO_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani2);
+//        ImageManager.BOMB_FRAME_THREE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani3);
+//        ImageManager.BOMB_FRAME_FOUR_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani4);
+//        ImageManager.BOMB_FRAME_FIVE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani5);
+//        ImageManager.BOMB_FRAME_SIX_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani6);
+//        ImageManager.BOMB_FRAME_SEVEN_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani7);
+//        ImageManager.BOMB_FRAME_EIGHT_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani8);
+//        ImageManager.BOMB_FRAME_NINE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani9);
+    }
 }
+

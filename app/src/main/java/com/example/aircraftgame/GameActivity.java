@@ -3,11 +3,7 @@ package com.example.aircraftgame;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -15,20 +11,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.Toast;
-
-import com.example.aircraftgame.GameDifficulty.DifficultGameView;
-import com.example.aircraftgame.GameDifficulty.EasyGameView;
-import com.example.aircraftgame.GameDifficulty.NormalGameView;
-
-import java.util.logging.LogManager;
 
 import MusicPlayer.MusicServer;
-import PublicLockAndFlag.GameBossFlag;
-import PublicLockAndFlag.GameHitFlag;
 import PublicLockAndFlag.GameOverFlag;
-import PublicLockAndFlag.GameSupplyFlag;
 import aircraft.HeroAircraft;
 import sp_objects.Laser;
 import sp_objects.Shield;

@@ -1,10 +1,12 @@
-package com.example.aircraftgame.GameDifficulty;
+package com.example.aircraftgame;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 
 import com.example.aircraftgame.GameActivity;
 import com.example.aircraftgame.GameViewTest;
 
+import application.ImageManager;
 import factory.BossEnemyFactory;
 import factory.EliteEnemyFactory;
 import factory.MobEnemyFactory;
@@ -56,4 +58,12 @@ public class NormalGameView extends GameViewTest {
          elitePower = elitePower>20?20:(int)(super.elitePower*rate); //ver2.0添加，精英敌机单个子弹的威力（随难度成比例改变,目前暂定为15）
     }
 
+    @Override
+    public void loadImagesByDiff() {
+        ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg4);
+        ImageManager.MOB_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.mob3);
+        ImageManager.ELITE_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.elite3);
+        ImageManager.ENEMY_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_enemy3);
+        ImageManager.setUpClassnameImageMap();
+    }
 }
