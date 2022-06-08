@@ -81,9 +81,9 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-        HeroAircraft.getHeroAircraft(new StraightShoot()).setLocation(event.getX(), event.getY());
-        Shield.getShield(event.getX(), event.getY() - 100);
-        Laser.getLaser(event.getX(), event.getY() - 20);
+        HeroAircraft.getHeroAircraft(new StraightShoot()).setLocation(event.getX(), event.getY() - 150);
+        Shield.getShield(event.getX(), event.getY() - 230);
+        Laser.getLaser(event.getX(), event.getY() - 200);
         return true;
     }
 
