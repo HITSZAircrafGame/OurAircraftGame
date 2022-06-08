@@ -127,7 +127,7 @@ public class GameViewTest extends SurfaceView implements
     protected int y1;
     protected int y2;
 
-    private Context parentContext;
+    protected Context parentContext;
     /**
      * 火力道具生效标记
      * **/
@@ -238,23 +238,8 @@ public class GameViewTest extends SurfaceView implements
         // 后处理
         postProcessAction();
 
-
         // 游戏结束检查
-        if (heroAircraft.getHp() <= 0) {
-            // 游戏结束
-            recordTime();
-            mbLoop = false;
-            gameOverFlag = true;
-
-            parentContext = this.getContext();
-            Intent intent = new Intent(parentContext,RankBoard.class);
-            parentContext.startActivity(intent);
-//            recordTip(parentContext);
-//            intent.putExtra("enteredName", enteredName);
-//            parentContext.startActivity(intent);
-            GameOverFlag.gameOverFlag=true;
-            Log.i("updateGame","Game Over");
-        }
+        finishGame();
     }
 
     //***********************
@@ -346,6 +331,25 @@ public class GameViewTest extends SurfaceView implements
     //钩子方法
     public boolean hook(){
         return false;
+    }
+
+    //游戏结束逻辑
+    public void finishGame(){
+        if (heroAircraft.getHp() <= 0) {
+            // 游戏结束
+            recordTime();
+            mbLoop = false;
+            gameOverFlag = true;
+
+            parentContext = this.getContext();
+            Intent intent = new Intent(parentContext,RankBoard.class);
+            parentContext.startActivity(intent);
+//            recordTip(parentContext);
+//            intent.putExtra("enteredName", enteredName);
+//            parentContext.startActivity(intent);
+            GameOverFlag.gameOverFlag=true;
+            Log.i("updateGame","Game Over");
+        }
     }
     /**
      * 碰撞检测：
