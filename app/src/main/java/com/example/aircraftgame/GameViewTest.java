@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import java.io.FileNotFoundException;
+import java.lang.reflect.Executable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -185,8 +186,9 @@ public class GameViewTest extends SurfaceView implements
     /**boss机阈值**/
     protected int bossScore;
 
-    /**积分**/
-    protected int bonus;
+    /**积分商城相关**/
+    protected int bonus = 1000; //这里为了方便测试改成了1000积分，可修改
+    protected static int bonusSelected = -1; //用户选择道具商城道具的标志，默认-1未选择，0~2是选择
 
     public GameViewTest(Context context, int screenWidth, int screenHeight) {
 
@@ -270,6 +272,9 @@ public class GameViewTest extends SurfaceView implements
 
         // 飞机移动
         aircraftsMoveAction();
+
+        // 生成用户积分购买的道具
+        createBonusProp();
 
         // ver1.0添加：道具移动
         propsMoveAction();
@@ -813,6 +818,45 @@ public class GameViewTest extends SurfaceView implements
     }
 
     /**
+     * 生成用户在积分商城购买的道具
+     * */
+    protected void createBonusProp(){
+        if(bonusSelected == -1){
+            return;
+        } else if(GameActivity.getTouchTime() >= 2) {
+            switch (bonusSelected){
+                case 0:
+                    processBonusShop(spf, 10);
+                    break;
+                case 1:
+                    processBonusShop(lpf, 20);
+                    break;
+                case 2:
+                    processBonusShop(bopf, 40);
+                    break;
+                default:
+                    break;
+            }
+            bonusSelected = -1;
+            GameActivity.setTouchTime(0);
+        }
+    }
+
+    /**
+     * 判断是否生成用户要购买的道具，如果是，生成它
+     * */
+    protected void processBonusShop(PropFactory pf, int neededBonus){
+        if(bonus < neededBonus){
+            return;
+        } else {
+            bonus -= neededBonus;
+            props.add(pf.createProp(50, 50,
+                    (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
+                    6*GameActivity.WINDOW_HEIGHT/700));
+        }
+    }
+
+    /**
      * 后处理：
      * 1. 删除无效的子弹
      * 2. 删除无效的敌机
@@ -907,6 +951,9 @@ public class GameViewTest extends SurfaceView implements
 
         //绘制得分和生命值
         paintScoreAndLife(cvs);
+
+        //绘制积分商城图标
+        paintBonusShop(cvs);
     }
 
     /***
@@ -979,6 +1026,22 @@ public class GameViewTest extends SurfaceView implements
     }
 
     /**
+     * 绘制积分商城图标
+     * */
+    protected void paintBonusShop(Canvas cvs){
+        int x = 10;
+        int y = 2000;
+        cvs.drawBitmap(ImageManager.BONUS_SHIELD_IMAGE, x, y, mPaint);
+        cvs.drawText("10", x, y + 200, mPaint);
+        x += 200;
+        cvs.drawBitmap(ImageManager.BONUS_LASER_IMAGE, x, y, mPaint);
+        cvs.drawText("20", x, y + 200, mPaint);
+        x += 200;
+        cvs.drawBitmap(ImageManager.BONUS_BOMB_IMAGE, x, y, mPaint);
+        cvs.drawText("40", x, y + 200, mPaint);
+    }
+
+    /**
      * 加载图片的方法，设为空方法让子类不同难度予以覆写
      **/
     public void loadImages() {
@@ -994,6 +1057,7 @@ public class GameViewTest extends SurfaceView implements
             loadPropImages();
             loadLaserAniImages();
             loadBombAniImages();
+            loadBonusShopImages();
 
             ImageManager.setUpClassnameImageMap();
         } catch (Exception e) {
@@ -1059,10 +1123,6 @@ public class GameViewTest extends SurfaceView implements
         ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser2));
         ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser3));
         ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser4));
-//        ImageManager.LASER_FRAME_ONE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser1);
-//        ImageManager.LASER_FRAME_TWO_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser2);
-//        ImageManager.LASER_FRAME_THREE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser3);
-//        ImageManager.LASER_FRAME_FOUR_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.laser4);
     }
 
     /**
@@ -1079,15 +1139,39 @@ public class GameViewTest extends SurfaceView implements
         ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani7));
         ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani8));
         ImageManager.BOMB_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani9));
-//        ImageManager.BOMB_FRAME_ONE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani1);
-//        ImageManager.BOMB_FRAME_TWO_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani2);
-//        ImageManager.BOMB_FRAME_THREE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani3);
-//        ImageManager.BOMB_FRAME_FOUR_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani4);
-//        ImageManager.BOMB_FRAME_FIVE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani5);
-//        ImageManager.BOMB_FRAME_SIX_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani6);
-//        ImageManager.BOMB_FRAME_SEVEN_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani7);
-//        ImageManager.BOMB_FRAME_EIGHT_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani8);
-//        ImageManager.BOMB_FRAME_NINE_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bomb_ani9);
+    }
+
+    /**
+     * 加载积分商城道具图标
+     * */
+    protected void loadBonusShopImages(){
+        ImageManager.BONUS_SHIELD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bonus_prop_shield);
+        ImageManager.BONUS_LASER_IMAGE = BitmapFactory.decodeResource(getResources(),R.drawable.bonus_prop_laser);
+        ImageManager.BONUS_BOMB_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bonus_prop_bomb);
+    }
+
+    /**
+     * 给外部用来设置选择道具商城的道具标志值
+     * */
+    public static void setBonusSelected(int select){
+        if(select < 0 || select > 2){
+            return;
+        } else {
+            switch (select){
+                case 0:
+                    bonusSelected = 0;
+                    break;
+                case 1:
+                    bonusSelected = 1;
+                    break;
+                case 2:
+                    bonusSelected = 2;
+                    break;
+                default:
+                    bonusSelected = -1;
+                    break;
+            }
+        }
     }
 }
 
