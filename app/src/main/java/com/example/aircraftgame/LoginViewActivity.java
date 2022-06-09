@@ -5,12 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.aircraftgame.NetGame.PlayerInfo;
+
 import login.Player;
 import login.PlayerAccess;
 
@@ -18,7 +22,7 @@ import login.PlayerAccess;
 public class LoginViewActivity extends AppCompatActivity implements ButtonAnimation{
 
     private String passedPlayerName;
-
+    private String TAG="Login";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +60,15 @@ public class LoginViewActivity extends AppCompatActivity implements ButtonAnimat
             if(editedPass.equals(foundPlayer.getPassword())){
                 Toast.makeText(getApplicationContext(),
                         "登录成功", Toast.LENGTH_SHORT).show();
+                try{
+                    PlayerInfo.playerInfo.put("PlayerName",editedName);
+                    PlayerInfo.playerInfo.put("PassWord",editedPass);
+                    Log.i(TAG,"Player: "+PlayerInfo.playerInfo.getString("PlayerName"));
+                    Log.i(TAG,"PassWord: "+PlayerInfo.playerInfo.getString("PassWord"));
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
                 Intent intent = new Intent(LoginViewActivity.this,
                         OnlineMenu.class);
                 intent.putExtra("playerName", editedName);

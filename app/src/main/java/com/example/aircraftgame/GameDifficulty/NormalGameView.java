@@ -1,4 +1,4 @@
-package com.example.aircraftgame;
+package com.example.aircraftgame.GameDifficulty;
 
 import android.content.Context;
 import android.util.Log;
@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 
 import com.example.aircraftgame.GameActivity;
 import com.example.aircraftgame.GameViewTest;
+import com.example.aircraftgame.R;
 
 import application.ImageManager;
 import factory.BossEnemyFactory;

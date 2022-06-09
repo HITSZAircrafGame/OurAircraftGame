@@ -3,6 +3,7 @@ package com.example.aircraftgame;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -72,11 +73,12 @@ public class GameActivity extends AppCompatActivity {
         //Handler实例化
         mHandler=new mHandler();
 
-//        gvt=new NetGame(GameActivity.this,WINDOW_WIDTH,WINDOW_HEIGHT);
-//        setContentView(gvt);
-        new OnlineGame().start();
-//        localGame();
-
+        if(StartActivity.getIsOnline()){
+            new OnlineGame().start();
+        }
+        else{
+            localGame();
+        }
     }
 
     @Override
@@ -124,7 +126,7 @@ public class GameActivity extends AppCompatActivity {
               Message msg=Message.obtain();
               Log.i(OnlineTAG,"发送连接请求");
               socket=new Socket();
-              socket.connect(new InetSocketAddress("192.168.43.93",1111),5000);
+              socket.connect(new InetSocketAddress("192.168.56.1",1111),5000);
 
               Log.i(OnlineTAG,"玩家连接完毕");
               output =new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
@@ -229,6 +231,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**Handler类更新UI**/
+    @SuppressLint("HandlerLeak")
     class mHandler extends Handler{
         @Override
         public void handleMessage(Message msg){

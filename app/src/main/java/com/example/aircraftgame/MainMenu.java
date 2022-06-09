@@ -25,6 +25,7 @@ public class MainMenu extends AppCompatActivity implements ButtonAnimation{
         Button easyButton = (Button)findViewById(R.id.easyButton);
 
         Intent intent = new Intent(MainMenu.this,GameActivity.class);
+        intent.putExtra("isOnline",false);
         easyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

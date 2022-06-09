@@ -15,6 +15,7 @@ import PublicLockAndFlag.GameOverFlag;
 import PublicLockAndFlag.OnlineGameOver;
 
 //Online Playing Model
+@SuppressLint("ViewConstructor")
 public class NetGame extends DifficultGameView {
     public String TAG="NetGame";
 
