@@ -1,10 +1,7 @@
 package com.example.aircraftgame;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,18 +13,13 @@ import android.os.Build;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import java.io.FileNotFoundException;
-import java.lang.reflect.Executable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -66,12 +58,11 @@ import product.prop.BombProp;
 import product.prop.FireProp;
 import product.prop.LaserProp;
 import product.prop.ShieldProp;
-import record.ScoreBoard;
 import sp_objects.BombEffect;
 import sp_objects.Laser;
+import sp_objects.LaserEffect;
 import sp_objects.Shield;
 import strategy.ArrowShoot;
-import strategy.LaserShoot;
 import strategy.NoShoot;
 import strategy.ScatterShoot;
 import strategy.StraightShoot;
@@ -133,11 +124,13 @@ public class GameViewTest extends SurfaceView implements
      * */
     protected Shield myShield;
     protected int shieldActive;
+    protected boolean crashAbleFlag = true;
 
     /**
      * 激光道具对象和激光道具生效标志
      * */
     protected Laser laser;
+    protected LaserEffect myLasEff;
     protected int laserActive = 0;
     protected boolean firePropAllowed = true;
     protected int laserFrameCount = 0; //指明当前是激光动画的第几帧
@@ -404,6 +397,9 @@ public class GameViewTest extends SurfaceView implements
     @RequiresApi(api = Build.VERSION_CODES.N)
     protected void crashCheckAction() {
 
+        //激光碰撞检测
+        laserCrashCheckAction();
+
         //护盾碰撞检测
         shieldCrashCheckAction();
 
@@ -472,16 +468,23 @@ public class GameViewTest extends SurfaceView implements
                     // 敌机撞击到英雄机子弹
                     // 敌机损失一定生命值
                     enemyAircraft.decreaseHp(bullet.getPower());
-                    if(!(bullet instanceof InvisibleBullet)) {
-                        bullet.vanish();
-                    }
+                    bullet.vanish();
                     resEnemyFalling(enemyAircraft);
                 }
-                // 英雄机 与 敌机 相撞，均损毁
-                if (enemyAircraft.crash(heroAircraft) || heroAircraft.crash(enemyAircraft)) {
-                    enemyAircraft.vanish();
-                    heroAircraft.decreaseHp(Integer.MAX_VALUE);
-                }
+                heroEnemyCrashCheckAction(enemyAircraft);
+            }
+        }
+    }
+
+    /**
+     * 英雄机碰撞敌机生效函数
+     * */
+    private void heroEnemyCrashCheckAction(AbstractAircraft enemyAircraft){
+        // 英雄机 与 敌机 相撞，均损毁
+        if (enemyAircraft.crash(heroAircraft) || heroAircraft.crash(enemyAircraft)) {
+            if(crashAbleFlag) {
+                enemyAircraft.vanish();
+                heroAircraft.decreaseHp(Integer.MAX_VALUE);
             }
         }
     }
@@ -501,6 +504,20 @@ public class GameViewTest extends SurfaceView implements
                     enemyAircraft.vanish();
                     score += 10;
                     scoreBound += 10;
+                }
+            }
+        }
+    }
+
+    /**
+     * 激光碰撞生效函数
+     * */
+    private void laserCrashCheckAction(){
+        if (myLasEff != null){
+            for (AbstractAircraft enemyAircraft : enemyAircrafts) {
+                if (enemyAircraft.crash(myLasEff)){
+                    enemyAircraft.decreaseHp(200);
+                    resEnemyFalling(enemyAircraft);
                 }
             }
         }
@@ -647,6 +664,7 @@ public class GameViewTest extends SurfaceView implements
      * 护盾道具生效反响函数
      * **/
     private void resShieldPropActive(){
+        crashAbleFlag = false;
         synchronized (GameShieldSupplyLock.lock) {
             shieldActive++;
         }
@@ -665,6 +683,7 @@ public class GameViewTest extends SurfaceView implements
                 }
 
                 if (lastShieldActive == shieldActive || lastShieldActive == 5) {
+                    crashAbleFlag = true;
                     shieldActive = 0;
                     myShield = null;
                     Log.i("Shield", "Shield supply over!");
@@ -688,7 +707,9 @@ public class GameViewTest extends SurfaceView implements
             Log.i("Laser", "Laser supply start!");
             laser = Laser.getLaser(heroAircraft.getLocationX(),
                     heroAircraft.getLocationY() - 20);
-            heroAircraft.setShootWay(new LaserShoot());
+            myLasEff = LaserEffect.getLaserEffect(heroAircraft.getLocationX(),
+                    heroAircraft.getLocationY() - 20);
+            heroAircraft.setShootWay(new NoShoot());
             firePropAllowed = false;
             Runnable r = () -> {
                 int lastLaserActive;
@@ -702,6 +723,7 @@ public class GameViewTest extends SurfaceView implements
 
                 if (lastLaserActive == laserActive || lastLaserActive == 3) {
                     laser = null;
+                    myLasEff = null;
                     laserActive = 0;
                     heroAircraft.setShootWay(new StraightShoot());
                     heroAircraft.setShootNum(1);
@@ -850,7 +872,7 @@ public class GameViewTest extends SurfaceView implements
             return;
         } else {
             bonus -= neededBonus;
-            props.add(pf.createProp(50, 50,
+            props.add(pf.createProp(50, 1400,
                     (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,
                     6*GameActivity.WINDOW_HEIGHT/700));
         }
@@ -1032,13 +1054,13 @@ public class GameViewTest extends SurfaceView implements
         int x = 10;
         int y = 2000;
         cvs.drawBitmap(ImageManager.BONUS_SHIELD_IMAGE, x, y, mPaint);
-        cvs.drawText("10", x, y + 200, mPaint);
+        cvs.drawText("10", x + 10, y + 200, mPaint);
         x += 200;
         cvs.drawBitmap(ImageManager.BONUS_LASER_IMAGE, x, y, mPaint);
-        cvs.drawText("20", x, y + 200, mPaint);
+        cvs.drawText("20", x + 10, y + 200, mPaint);
         x += 200;
         cvs.drawBitmap(ImageManager.BONUS_BOMB_IMAGE, x, y, mPaint);
-        cvs.drawText("40", x, y + 200, mPaint);
+        cvs.drawText("40", x + 10, y + 200, mPaint);
     }
 
     /**
@@ -1090,7 +1112,8 @@ public class GameViewTest extends SurfaceView implements
      * 加载特殊物体的图片，有扩展在此新增
      * */
     protected void loadSpeObjImages(){
-        ImageManager.SHIELD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.shield);
+        ImageManager.SHIELD_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.shield2);
+        ImageManager.EFFECT_LASER_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_invisible);
         ImageManager.MIPMAP_BONUS_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bonus);
     }
 
@@ -1099,7 +1122,6 @@ public class GameViewTest extends SurfaceView implements
      * */
     protected void loadCommonBulletImages(){
         ImageManager.HERO_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_hero2);
-        ImageManager.INVISIBLE_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_invisible);
         ImageManager.MAGIC_ARROW_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_magic_arrow);
     }
 

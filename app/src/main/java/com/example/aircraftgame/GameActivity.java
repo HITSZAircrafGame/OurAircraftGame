@@ -15,7 +15,9 @@ import android.view.WindowManager;
 import MusicPlayer.MusicServer;
 import PublicLockAndFlag.GameOverFlag;
 import aircraft.HeroAircraft;
+import application.ImageManager;
 import sp_objects.Laser;
+import sp_objects.LaserEffect;
 import sp_objects.Shield;
 import strategy.StraightShoot;
 
@@ -84,9 +86,12 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event){
         if(!isBonusPropTouched(event)) {
-            HeroAircraft.getHeroAircraft(new StraightShoot()).setLocation(event.getX(), event.getY() - 150);
-            Shield.getShield(event.getX(), event.getY() - 230);
+            HeroAircraft.getHeroAircraft(new StraightShoot()).setLocation(event.getX(),
+                    event.getY() - ImageManager.HERO_IMAGE.getHeight() / 2);
+            Shield.getShield(event.getX(),
+                    event.getY() - ImageManager.HERO_IMAGE.getHeight() / 2);
             Laser.getLaser(event.getX(), event.getY() - 200);
+            LaserEffect.getLaserEffect(event.getX(), event.getY() - 200);
         }
         return true;
     }

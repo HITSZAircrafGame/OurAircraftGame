@@ -17,6 +17,7 @@ import product.prop.LaserProp;
 import product.prop.ShieldProp;
 import sp_objects.BonusStar;
 import sp_objects.Laser;
+import sp_objects.LaserEffect;
 import sp_objects.Shield;
 
 import java.util.HashMap;
@@ -43,7 +44,6 @@ public class ImageManager {
 
     public static Bitmap HERO_BULLET_IMAGE;
     public static Bitmap ENEMY_BULLET_IMAGE;
-    public static Bitmap INVISIBLE_BULLET_IMAGE;
 
     public static Bitmap MOB_ENEMY_IMAGE;
     public static Bitmap ELITE_ENEMY_IMAGE;
@@ -58,6 +58,7 @@ public class ImageManager {
     public static Bitmap MAGIC_ARROW_IMAGE;
     public static Bitmap SHIELD_IMAGE;
     public static Bitmap MIPMAP_BONUS_IMAGE;
+    public static Bitmap EFFECT_LASER_IMAGE;
 
     //积分商城的三张图片
     public static Bitmap BONUS_SHIELD_IMAGE;
@@ -117,7 +118,6 @@ public class ImageManager {
     public static void setUpBulletImages(){
         CLASSNAME_IMAGE_MAP.put(HeroBullet.class.getName(), HERO_BULLET_IMAGE);
         CLASSNAME_IMAGE_MAP.put(EnemyBullet.class.getName(), ENEMY_BULLET_IMAGE);
-        CLASSNAME_IMAGE_MAP.put(InvisibleBullet.class.getName(), INVISIBLE_BULLET_IMAGE);
         CLASSNAME_IMAGE_MAP.put(MagicArrow.class.getName(), MAGIC_ARROW_IMAGE);
     }
 
@@ -137,5 +137,6 @@ public class ImageManager {
      * */
     public static void setUpSpeObjImages(){
         CLASSNAME_IMAGE_MAP.put(Shield.class.getName(), SHIELD_IMAGE);
+        CLASSNAME_IMAGE_MAP.put(LaserEffect.class.getName(), EFFECT_LASER_IMAGE);
     }
 }
