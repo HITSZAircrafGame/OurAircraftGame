@@ -3,8 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/AndroidCoding/MyGame/AircraftGame/app/src/main/res/layout/activity_main_menu.xml" value="0.16847826086956522" />
+        <entry key="..\:/AndroidCoding/MyGame/AircraftGame/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="..\:/AndroidCoding/MyGame/AircraftGame/app/src/main/res/layout/activity_login_view.xml" value="0.1" />
+        <entry key="..\:/AndroidCoding/MyGame/AircraftGame/app/src/main/res/layout/activity_main.xml" value="0.264" />
+        <entry key="..\:/AndroidCoding/MyGame/AircraftGame/app/src/main/res/layout/activity_main_menu.xml" value="0.264" />
+        <entry key="..\:/AndroidCoding/MyGame/AircraftGame/app/src/main/res/layout/activity_online_menu.xml" value="0.264" />
         <entry key="..\:/AndroidCoding/MyGame/AircraftGame/app/src/main/res/layout/activity_rank_board.xml" value="0.16847826086956522" />
+        <entry key="..\:/AndroidCoding/MyGame/AircraftGame/app/src/main/res/layout/activity_waiting.xml" value="0.4" />
         <entry key="..\:/AndroidStudio/Projects/AircraftGame/app/src/main/res/layout/activity_main.xml" value="0.22826086956521738" />
         <entry key="..\:/AndroidStudio/Projects/AircraftGame/app/src/main/res/layout/activity_main2.xml" value="0.12604166666666666" />
         <entry key="..\:/AndroidStudio/Projects/AircraftGame/app/src/main/res/layout/activity_main_menu.xml" value="0.2" />

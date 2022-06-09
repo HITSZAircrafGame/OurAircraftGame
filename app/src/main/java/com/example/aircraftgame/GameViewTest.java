@@ -48,6 +48,7 @@ import factory.FirePropFactory;
 import factory.LaserPropFactory;
 import factory.MobEnemyFactory;
 import factory.PropFactory;
+import product.enemy.BaseEnemy;
 import factory.ShieldPropFactory;
 import product.enemy.BossEnemy;
 import product.enemy.EliteEnemy;
@@ -159,7 +160,7 @@ public class GameViewTest extends SurfaceView implements
     protected int y1;
     protected int y2;
 
-    private Context parentContext;
+    protected Context parentContext;
     /**
      * 火力道具生效标记
      * **/
@@ -209,7 +210,6 @@ public class GameViewTest extends SurfaceView implements
         mSurfaceHolder = this.getHolder();
         mSurfaceHolder.addCallback(this);
         this.setFocusable(true);
-
         //初始化标志和锁
         GameOverFlag.gameOverFlag=false;
         GameBossFlag.flag=false;
@@ -278,23 +278,8 @@ public class GameViewTest extends SurfaceView implements
         // 后处理
         postProcessAction();
 
-
         // 游戏结束检查
-        if (heroAircraft.getHp() <= 0) {
-            // 游戏结束
-            recordTime();
-            mbLoop = false;
-            gameOverFlag = true;
-
-            parentContext = this.getContext();
-            Intent intent = new Intent(parentContext,RankBoard.class);
-            parentContext.startActivity(intent);
-//            recordTip(parentContext);
-//            intent.putExtra("enteredName", enteredName);
-//            parentContext.startActivity(intent);
-            GameOverFlag.gameOverFlag=true;
-            Log.i("updateGame","Game Over");
-        }
+        finishGame();
     }
 
     //***********************
@@ -388,6 +373,24 @@ public class GameViewTest extends SurfaceView implements
         return false;
     }
 
+    //游戏结束逻辑
+    public void finishGame(){
+        if (heroAircraft.getHp() <= 0) {
+            // 游戏结束
+            recordTime();
+            mbLoop = false;
+            gameOverFlag = true;
+
+            parentContext = this.getContext();
+            Intent intent = new Intent(parentContext,RankBoard.class);
+            parentContext.startActivity(intent);
+//            recordTip(parentContext);
+//            intent.putExtra("enteredName", enteredName);
+//            parentContext.startActivity(intent);
+            GameOverFlag.gameOverFlag=true;
+            Log.i("updateGame","Game Over");
+        }
+    }
     /**
      * 碰撞检测：
      * 1. 敌机攻击英雄
@@ -940,6 +943,7 @@ public class GameViewTest extends SurfaceView implements
     public void paint(Canvas cvs){
         //滚动算法
         Log.i("Height",GameActivity.WINDOW_HEIGHT+"");
+        Log.i("ImageHeigh",ImageManager.BACKGROUND_IMAGE.getHeight()+"");
         y1=(y1>=GameActivity.WINDOW_HEIGHT)?y2:y1+GameActivity.WINDOW_HEIGHT/500;
         y2=y1-ImageManager.BACKGROUND_IMAGE.getHeight();
 

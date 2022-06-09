@@ -35,7 +35,7 @@ public class BossEnemyFactory implements EnemyFactory {
                 ImageManager.BOSS_ENEMY_IMAGE.getHeight() - 100,
                 (Math.random() > 0.5 ? 7:-7)* GameActivity.WINDOW_WIDTH/300,      //Boss机略大于精英敌机，移动稍慢
                 0,      //boss机无纵向移动速度
-                200,    //随难度预设
+                bossHp,    //随难度预设
                 new ScatterShoot(), //射击方式，散射
                 bossShootNum, //随难度预设
                 bossPower,  //随难度预设

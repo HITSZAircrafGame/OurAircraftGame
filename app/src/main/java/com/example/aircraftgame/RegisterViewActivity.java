@@ -51,6 +51,7 @@ public class RegisterViewActivity extends AppCompatActivity implements ButtonAni
                 initButton(cancelButton);
                 finish();
             }
+
         });
     }
 
