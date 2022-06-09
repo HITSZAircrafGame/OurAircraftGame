@@ -2,11 +2,12 @@ package login;
 
 //Player类是一个JavaBean
 
-public class Player {
+import org.litepal.crud.LitePalSupport;
+
+public class Player extends LitePalSupport {
     /**
      * 玩家账号的信息：玩家名称、账号密码、积分
      * */
-    private int id;
     private String playerName;
     private String password;
     private int bonus;
@@ -15,14 +16,6 @@ public class Player {
         this.playerName = playerName;
         this.password = password;
         this.bonus = bonus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getPlayerName() {

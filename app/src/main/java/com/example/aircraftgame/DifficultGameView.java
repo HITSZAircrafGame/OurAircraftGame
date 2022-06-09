@@ -1,10 +1,12 @@
-package com.example.aircraftgame.GameDifficulty;
+package com.example.aircraftgame;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.example.aircraftgame.GameViewTest;
 
+import application.ImageManager;
 import factory.BossEnemyFactory;
 import factory.EliteEnemyFactory;
 import factory.EnemyFactory;
@@ -69,4 +71,12 @@ public class DifficultGameView extends GameViewTest {
 
     }
 
+    @Override
+    public void loadImagesByDiff() {
+        ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg5);
+        ImageManager.MOB_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.mob4);
+        ImageManager.ELITE_ENEMY_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.elite4);
+        ImageManager.ENEMY_BULLET_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bullet_enemy4);
+        ImageManager.setUpClassnameImageMap();
+    }
 }

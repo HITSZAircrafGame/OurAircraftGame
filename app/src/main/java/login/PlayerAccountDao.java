@@ -1,7 +1,8 @@
 package login;
 
 public interface PlayerAccountDao {
-    int login(String playerName, String password);
-    boolean register(Player player);
+    void addPlayer(String playerName, String password);
+    void updatePlayer(String playerName,int bonus);
+    void deletePlayer(String playerName);
     Player findPlayer(String playerName);
 }

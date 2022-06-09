@@ -17,6 +17,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupWindow;
@@ -37,6 +39,8 @@ public class RankBoard extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_rank_board);
 
         //转化难度字符串
@@ -45,8 +49,8 @@ public class RankBoard extends AppCompatActivity {
         //创建排行榜对象
         sb = new ScoreBoard(difficultyString);
 
-        //为删除按钮添加监听器
-        deleteButtonSetListener();
+//        //为删除按钮添加监听器
+//        deleteButtonSetListener();
 
         //设置排行榜显示的难度
         showDifficulty();
@@ -94,53 +98,13 @@ public class RankBoard extends AppCompatActivity {
     }
 
     /**
-     * 弹出对话框，提示是否需要删除选中的游玩记录
-     **/
-    private void deleteTip(){
-        rba.checkDeletingRecord();
-        List<String> deletingRecordTimeList = rba.getSelectedRecordTimeList();
-        AlertDialog alert = null;
-        AlertDialog.Builder bulider = null;
-        bulider = new AlertDialog.Builder(RankBoard.this)
-                .setTitle("删除记录")
-                .setIcon(R.mipmap.ic_launcher)
-                .setMessage("您确定要删除选中的这些记录吗？")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(deletingRecordTimeList.size() == 0){
-                            Toast.makeText(RankBoard.this, "未选中任何要删除的记录！",
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            rba.deleteSelectedRow();
-                            for(int i = 0; i < deletingRecordTimeList.size(); i++){
-                                sb.deleteRecords(deletingRecordTimeList.get(i));
-                            }
-                            Toast.makeText(RankBoard.this, "选中的所有记录已删除",
-                                    Toast.LENGTH_SHORT).show();
-                            showScoreBoard();
-                        }
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(RankBoard.this, "删除取消",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-        alert = bulider.create();
-        alert.show();
-    }
-
-    /**
      * 显示排行榜具体界面
      * */
     private void showScoreBoard(){
         RecyclerView rv = findViewById(R.id.recyclerView);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
-        rba = new RankBoardAdapter(sb.getAllRecords());
+        rba = new RankBoardAdapter(RankBoard.this, sb, sb.getAllRecords());
         rv.setAdapter(rba);
     }
 
@@ -148,7 +112,7 @@ public class RankBoard extends AppCompatActivity {
      * 显示难度标签
      * */
     private void showDifficulty(){
-        TextView tv = (TextView)findViewById(R.id.DifficultyTag);
+        TextView tv = (TextView)findViewById(R.id.text_difficulty);
         switch (GameActivity.getGameDifficulty()){
             case 1: {
                 tv.setText("难度：简单");
@@ -163,19 +127,6 @@ public class RankBoard extends AppCompatActivity {
                 break;
             }
         }
-    }
-
-    /**
-     * 为删除按钮添加监听器
-     * */
-    private void deleteButtonSetListener(){
-        Button deleteButton = (Button)findViewById(R.id.DeleteButton);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteTip();
-            }
-        });
     }
 
     /**

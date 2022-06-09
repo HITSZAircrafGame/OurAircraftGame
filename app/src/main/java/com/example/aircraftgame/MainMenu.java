@@ -6,17 +6,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-public class MainMenu extends AppCompatActivity {
+public class MainMenu extends AppCompatActivity implements ButtonAnimation{
 
     private boolean videoOn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main_menu);
         Button easyButton = (Button)findViewById(R.id.easyButton);
 
@@ -24,6 +28,7 @@ public class MainMenu extends AppCompatActivity {
         easyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                initButton(easyButton);
                 int easyFlag = 1;
                 intent.putExtra("difficulty", easyFlag);
                 startActivity(intent);
@@ -34,6 +39,7 @@ public class MainMenu extends AppCompatActivity {
         mediumButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                initButton(mediumButton);
                 int mediumFlag = 2;
                 intent.putExtra("difficulty", mediumFlag);
                 startActivity(intent);
@@ -44,6 +50,7 @@ public class MainMenu extends AppCompatActivity {
         hardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                initButton(hardButton);
                 int hardFlag = 3;
                 intent.putExtra("difficulty", hardFlag);
                 startActivity(intent);

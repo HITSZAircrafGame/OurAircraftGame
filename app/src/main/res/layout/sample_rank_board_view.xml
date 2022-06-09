@@ -1,66 +1,130 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="31dp"
-    android:orientation="vertical">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_rank_board_item"
+    android:layout_width="420dp"
+    android:layout_height="35dp"
+    android:orientation="horizontal"
+    android:background="@drawable/style_start_button">
 
-    <LinearLayout
-        android:id="@+id/RankBoardItemInnerLinearLayout"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/text_rank"
+        android:layout_width="70dp"
         android:layout_height="30dp"
-        android:orientation="horizontal">
+        android:gravity="center"
+        android:textSize="20dp"
+        android:textColor="@color/purple_700"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.008"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4" />
 
-        <CheckBox
-            android:id="@+id/checkBox1"
-            android:layout_width="32dp"
-            android:layout_height="30dp" />
+    <TextView
+        android:id="@+id/text_name"
+        android:layout_width="120dp"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:textColor="@color/purple_700"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4" />
 
-        <TextView
-            android:id="@+id/header1"
-            android:layout_width="34dp"
-            android:layout_height="30dp"
-            android:gravity="center" />
+    <TextView
+        android:id="@+id/text_score"
+        android:layout_width="70dp"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:textColor="@color/purple_700"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.581"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4" />
 
-        <View
-            android:id="@+id/view1"
-            android:layout_height="30dp"
-            android:layout_width="1dp"
-            android:background="@color/black" />
-
-        <TextView
-            android:id="@+id/header2"
-            android:layout_width="109dp"
-            android:layout_height="30dp"
-            android:gravity="center"/>
-
-        <View
-            android:id="@+id/view2"
-            android:layout_width="1dp"
-            android:layout_height="30dp"
-            android:background="@color/black" />
-
-        <TextView
-            android:id="@+id/header3"
-            android:layout_width="83dp"
-            android:layout_height="30dp"
-            android:gravity="center" />
-
-        <View
-            android:id="@+id/view3"
-            android:layout_height="30dp"
-            android:layout_width="1dp"
-            android:background="@color/black" />
-
-        <TextView
-            android:id="@+id/header4"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:gravity="center"/>
-    </LinearLayout>
-
-    <View
-        android:id="@+id/view4"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/black"/>
+    <TextView
+        android:id="@+id/text_time"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:textColor="@color/purple_700"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.986"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4" />
 
 </LinearLayout>
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/RankBoardItemInnerLinearLayout"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="30dp"-->
+    <!--        android:orientation="horizontal">-->
+
+    <!--        <CheckBox-->
+    <!--            android:id="@+id/checkBox1"-->
+    <!--            android:layout_width="32dp"-->
+    <!--            android:layout_height="30dp" />-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/header1"-->
+    <!--            android:layout_width="34dp"-->
+    <!--            android:layout_height="30dp"-->
+    <!--            android:gravity="center" />-->
+
+    <!--        <View-->
+    <!--            android:id="@+id/view1"-->
+    <!--            android:layout_height="30dp"-->
+    <!--            android:layout_width="1dp"-->
+    <!--            android:background="@color/black" />-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/header2"-->
+    <!--            android:layout_width="112dp"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:gravity="center" />-->
+
+    <!--        <View-->
+    <!--            android:id="@+id/view2"-->
+    <!--            android:layout_width="1dp"-->
+    <!--            android:layout_height="30dp"-->
+    <!--            android:background="@color/black" />-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/header3"-->
+    <!--            android:layout_width="83dp"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:gravity="center" />-->
+
+    <!--        <View-->
+    <!--            android:id="@+id/view3"-->
+    <!--            android:layout_height="30dp"-->
+    <!--            android:layout_width="1dp"-->
+    <!--            android:background="@color/black" />-->
+
+    <!--        <TextView-->
+    <!--            android:id="@+id/header4"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="30dp"-->
+    <!--            android:gravity="center"/>-->
+    <!--    </LinearLayout>-->
+
+    <!--    <View-->
+    <!--        android:id="@+id/view4"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="1dp"-->
+    <!--        android:background="@color/black"/>-->

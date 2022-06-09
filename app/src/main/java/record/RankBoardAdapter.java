@@ -1,6 +1,8 @@
 package record;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,52 +11,45 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aircraftgame.R;
+import com.example.aircraftgame.RankBoard;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RankBoardAdapter extends RecyclerView.Adapter<RankBoardAdapter.ViewHolder> {
     private List<PlayerRecord> mrecords;
-    private List<Boolean> checkList = new ArrayList<>();
-    private List<String> selectedRecordTimeList = new ArrayList<>();
+    private Context parContext;
+    private ScoreBoard sb;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout linearLayout;
-        CheckBox checkBox;
         TextView rank;
-        View slice1;
         TextView name;
-        View slice2;
         TextView score;
-        View slice3;
         TextView time;
-        View bottomBound;
 
         public ViewHolder(@NonNull View view) {
             super(view);
-            linearLayout = view.findViewById(R.id.RankBoardItemInnerLinearLayout);
-            checkBox = view.findViewById(R.id.checkBox1);
-            rank = view.findViewById(R.id.header1);
-            slice1 = view.findViewById(R.id.view1);
-            name = view.findViewById(R.id.header2);
-            slice2 = view.findViewById(R.id.view2);
-            score = view.findViewById(R.id.header3);
-            slice3 = view.findViewById(R.id.view3);
-            time = view.findViewById(R.id.header4);
-            bottomBound = view.findViewById(R.id.view4);
+            linearLayout = view.findViewById(R.id.layout_rank_board_item);
+            rank = view.findViewById(R.id.text_rank);
+            name = view.findViewById(R.id.text_name);
+            score = view.findViewById(R.id.text_score);
+            time = view.findViewById(R.id.text_time);
         }
     }
 
-    public RankBoardAdapter(List<PlayerRecord> records){
-        mrecords = records;
-        for (int i = 0; i < records.size(); i++){
-            checkList.add(false);
-        }
+    public RankBoardAdapter(Context context,ScoreBoard sb,List<PlayerRecord> records){
+        this.mrecords = records;
+        this.parContext = context;
+        this.sb = sb;
     }
 
     @NonNull
@@ -74,41 +69,49 @@ public class RankBoardAdapter extends RecyclerView.Adapter<RankBoardAdapter.View
         holder.name.setText(pr.getName());
         holder.score.setText("" + pr.getScore());
         holder.time.setText(pr.getTime());
-        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        holder.linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                Log.d("isCalled","Yes! " + position + " " + isChecked);
-                checkList.set(position, isChecked);
-                Log.d("checkListSize","" + checkList.size());
+            public boolean onLongClick(View v) {
+                deleteTip(position);
+                return true;
             }
         });
-        holder.checkBox.setChecked(checkList.get(position));
+    }
+
+    /**
+     * 弹出对话框，提示是否需要删除选中的游玩记录
+     **/
+    private void deleteTip(int position){
+        AlertDialog alert = null;
+        AlertDialog.Builder bulider = null;
+        String tipMessage = "您确定要删除第" + (position+1) + "名的玩家" + mrecords.get(position).getName() + "的记录吗？";
+        bulider = new AlertDialog.Builder(parContext)
+                .setTitle("删除记录")
+                .setIcon(R.mipmap.ic_launcher)
+                .setMessage(tipMessage)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sb.deleteRecords(mrecords.get(position).getTime());
+                        mrecords.remove(position);
+                        notifyDataSetChanged();
+                        Toast.makeText(parContext, "删除成功",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(parContext, "删除取消",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+        alert = bulider.create();
+        alert.show();
     }
 
     @Override
     public int getItemCount(){
         return mrecords.size();
-    }
-
-    public void deleteSelectedRow(){
-        for(int i = 0; i < mrecords.size(); i++){
-            if(checkList.get(i) != null && checkList.get(i)){
-                mrecords.remove(i);
-                checkList.remove(i);
-                i--;
-            }
-        }
-        notifyDataSetChanged();
-    }
-
-    public void checkDeletingRecord(){
-        for(int i = 0; i < checkList.size(); i++){
-            if(checkList.get(i) != null && checkList.get(i)){
-                selectedRecordTimeList.add(mrecords.get(i).getTime());
-            }
-        }
-    }
-    public List<String> getSelectedRecordTimeList() {
-        return selectedRecordTimeList;
     }
 }

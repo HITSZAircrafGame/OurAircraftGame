@@ -34,6 +34,8 @@ import MusicPlayer.MusicServer;
 import PublicLockAndFlag.GameOverFlag;
 import PublicLockAndFlag.OnlineGameOver;
 import aircraft.HeroAircraft;
+import sp_objects.Laser;
+import sp_objects.Shield;
 import strategy.StraightShoot;
 
 public class GameActivity extends AppCompatActivity {
@@ -79,7 +81,9 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-        HeroAircraft.getHeroAircraft(new StraightShoot()).setLocation(event.getX(), event.getY());
+        HeroAircraft.getHeroAircraft(new StraightShoot()).setLocation(event.getX(), event.getY() - 150);
+        Shield.getShield(event.getX(), event.getY() - 230);
+        Laser.getLaser(event.getX(), event.getY() - 200);
         return true;
     }
 
