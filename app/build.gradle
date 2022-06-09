@@ -34,6 +34,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation files('libs\\litepal-2.0.0-src.jar')
     implementation files('libs\\mysql-connector-java-5.1.46-bin.jar')
+    implementation files('libs\\mysql-connector-java-5.1.46-bin.jar')
 //    implementation 'androidx.annotation:annotation:1.2.0'
 //    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
 //    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'

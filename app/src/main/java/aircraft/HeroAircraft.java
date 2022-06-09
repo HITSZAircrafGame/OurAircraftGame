@@ -94,4 +94,8 @@ public class HeroAircraft extends AbstractAircraft {
     public void setPower(int power) {
         this.power = power;
     }
+
+    public int getPower() {
+        return power;
+    }
 }
