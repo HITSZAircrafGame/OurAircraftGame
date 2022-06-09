@@ -59,25 +59,17 @@ public class ImageManager {
     public static Bitmap SHIELD_IMAGE;
     public static Bitmap MIPMAP_BONUS_IMAGE;
 
+    //积分商城的三张图片
+    public static Bitmap BONUS_SHIELD_IMAGE;
+    public static Bitmap BONUS_LASER_IMAGE;
+    public static Bitmap BONUS_BOMB_IMAGE;
+
     //激光动画的四帧图片
     public static List<Bitmap> LASER_FRAMES;
-//    public static Bitmap LASER_FRAME_ONE_IMAGE;
-//    public static Bitmap LASER_FRAME_TWO_IMAGE;
-//    public static Bitmap LASER_FRAME_THREE_IMAGE;
-//    public static Bitmap LASER_FRAME_FOUR_IMAGE;
-
 
     //爆炸动画的九帧图片
     public static List<Bitmap> BOMB_FRAMES;
-//    public static Bitmap BOMB_FRAME_ONE_IMAGE;
-//    public static Bitmap BOMB_FRAME_TWO_IMAGE;
-//    public static Bitmap BOMB_FRAME_THREE_IMAGE;
-//    public static Bitmap BOMB_FRAME_FOUR_IMAGE;
-//    public static Bitmap BOMB_FRAME_FIVE_IMAGE;
-//    public static Bitmap BOMB_FRAME_SIX_IMAGE;
-//    public static Bitmap BOMB_FRAME_SEVEN_IMAGE;
-//    public static Bitmap BOMB_FRAME_EIGHT_IMAGE;
-//    public static Bitmap BOMB_FRAME_NINE_IMAGE;
+
 
 
 
@@ -101,7 +93,6 @@ public class ImageManager {
         setUpBulletImages();
         setUpPropImages();
         setUpSpeObjImages();
-//        setUpLaserAniImages();
     }
 
     /**
@@ -146,16 +137,5 @@ public class ImageManager {
      * */
     public static void setUpSpeObjImages(){
         CLASSNAME_IMAGE_MAP.put(Shield.class.getName(), SHIELD_IMAGE);
-//        CLASSNAME_IMAGE_MAP.put(BonusStar.class.getName(), MIPMAP_BONUS_IMAGE);
     }
-
-//    /**
-//     * 设置激光动画所需图片，其实并不需要装入MAP
-//     * */
-//    public static void setUpLaserAniImages(){
-//        CLASSNAME_IMAGE_MAP.put(Laser.class.getName(), LASER_FRAME_ONE_IMAGE);
-//        CLASSNAME_IMAGE_MAP.put(Laser.class.getName(), LASER_FRAME_TWO_IMAGE);
-//        CLASSNAME_IMAGE_MAP.put(Laser.class.getName(), LASER_FRAME_THREE_IMAGE);
-//        CLASSNAME_IMAGE_MAP.put(Laser.class.getName(), LASER_FRAME_FOUR_IMAGE);
-//    }
 }

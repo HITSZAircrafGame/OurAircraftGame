@@ -55,6 +55,9 @@ public class GameActivity extends AppCompatActivity {
     private PrintWriter output;
     //handler
     private Handler mHandler;
+    //点击次数标记，处理点击抖动
+    private static int touchTime;
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -83,10 +86,41 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-        HeroAircraft.getHeroAircraft(new StraightShoot()).setLocation(event.getX(), event.getY() - 150);
-        Shield.getShield(event.getX(), event.getY() - 230);
-        Laser.getLaser(event.getX(), event.getY() - 200);
+        if(!isBonusPropTouched(event)) {
+            HeroAircraft.getHeroAircraft(new StraightShoot()).setLocation(event.getX(), event.getY() - 150);
+            Shield.getShield(event.getX(), event.getY() - 230);
+            Laser.getLaser(event.getX(), event.getY() - 200);
+        }
         return true;
+    }
+
+    /**
+     * 检查用户是否点击道具商城图标
+     * */
+    public boolean isBonusPropTouched(MotionEvent event){
+        int x = (int)event.getX();
+        int y = (int)event.getY();
+        Log.i("Touched: x = ", "" + x);
+        Log.i("Touched: y = ", "" + y);
+        if(y >= 2200 && y <= 2300) {
+            if (x >= 10 && x <= 130) {
+                touchTime++;
+                GameViewTest.setBonusSelected(0);
+                return true;
+            } else if(x >= 210 && x <= 330) {
+                touchTime++;
+                GameViewTest.setBonusSelected(1);
+                return true;
+            } else if(x >= 410 && x <= 530) {
+                touchTime++;
+                GameViewTest.setBonusSelected(2);
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     public void getWindowSize(){
@@ -257,6 +291,20 @@ public class GameActivity extends AppCompatActivity {
                     setContentView(R.layout.activity_main);
                     break;
             }
+        }
+    }
+     /* 外部获取点击次数的标志
+     * */
+    public static int getTouchTime() {
+        return touchTime;
+    }
+
+    /**外部重置点击次数标志的值*/
+    public static void setTouchTime(int myTouchTime){
+        if(myTouchTime != 0){
+            return;
+        } else {
+            touchTime = myTouchTime;
         }
     }
 }
