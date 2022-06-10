@@ -21,7 +21,7 @@ public class NormalGameView extends GameViewTest {
         enemyShootSpeed=1000;
         heroShootSpeed=480;
         this.eliteOccur=0.25f;
-        this.bossHp=500;
+        this.bossHp=1500;
         bossScore=500;
         rate=1;
     }

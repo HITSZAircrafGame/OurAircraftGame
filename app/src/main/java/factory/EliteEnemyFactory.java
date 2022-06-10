@@ -34,7 +34,7 @@ public class EliteEnemyFactory implements EnemyFactory {
                 (int) ( Math.random() * (GameActivity.WINDOW_WIDTH - ImageManager.ELITE_ENEMY_IMAGE.getWidth()))*1,
                 (int) (Math.random() * GameActivity.WINDOW_HEIGHT * 0.2)*1,
                 (Math.random() > 0.5 ? 7:-7)* GameActivity.WINDOW_WIDTH/350,      //不同于普通敌机，有横向速度，且初始横向移动方向随机
-                3*GameActivity.WINDOW_HEIGHT/500,      //不同于普通敌机，纵向速度要慢一些,约为1/3
+                GameActivity.WINDOW_HEIGHT/80,      //不同于普通敌机，纵向速度要慢一些,约为1/3
                 eliteHp,     //随难度预设
                 new StraightShoot(), //直射方式
                 elitePower,  //随难度预设

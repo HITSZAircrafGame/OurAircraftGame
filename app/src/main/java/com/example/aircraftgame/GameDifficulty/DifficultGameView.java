@@ -23,10 +23,10 @@ public class DifficultGameView extends GameViewTest {
         enemyShootSpeed=800;
         heroShootSpeed=400;
         this.eliteOccur=0.3f;
-        this.bossHp=800;
+        this.bossHp=2000;
         bossScore=666;
         rate=1;
-        bossPower=30;
+        bossPower=50;
         heroAircraft.setPower(50);
     }
 
@@ -49,7 +49,7 @@ public class DifficultGameView extends GameViewTest {
 
                     createBoss();
                     bossPower=bossPower<50?bossPower+10:bossPower;
-                    bossHp=bossHp+(int)(Math.random()*100);
+                    bossHp=bossHp+(int)(Math.random()*500);
                 }
             }
             if (enemyAircrafts.size() < enemyMaxNumber) {  //ver2.0修改过

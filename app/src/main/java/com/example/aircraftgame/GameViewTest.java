@@ -7,7 +7,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.util.Log;
@@ -78,7 +80,7 @@ public class GameViewTest extends SurfaceView implements
     protected SurfaceHolder mSurfaceHolder;
     protected Canvas canvas;  //绘图的画布
     protected Paint mPaint;
-
+    protected Bitmap background;
 
     /**
      * 时间间隔(ms)，控制刷新频率
@@ -94,16 +96,16 @@ public class GameViewTest extends SurfaceView implements
     protected int enemyMaxNumber = 5; //场上最多出现的敌机数量，暂定为5
 
     protected int mobHp = 30; //ver2.0添加，普通敌机生命值（随难度改变，目前暂定为30（一次受击））
-    protected int mobSpeedY = 10*GameActivity.WINDOW_HEIGHT/500; //ver2.0添加，普通敌机纵向移速（随难度改变，目前暂定为10）
+    protected int mobSpeedY = GameActivity.WINDOW_HEIGHT/50; //ver2.0添加，普通敌机纵向移速（随难度改变，目前暂定为10）
 
     protected float eliteOccur = 0.3f; //ver1.0添加，用于设置精英敌机出现的频率（随难度变化，目前暂定为10%）
     protected int eliteHp = 60; //ver1.0添加，用于设置精英敌机的生命值（随难度变化，目前暂定为60（两次攻击））
     protected int elitePower = 15; //ver2.0添加，精英敌机单个子弹的威力（随难度成比例改变,目前暂定为15）
-    protected int eliteBulletSpeed = 10*GameActivity.WINDOW_HEIGHT/500; //ver2.0添加，精英敌机子弹速度（随难度成比例改变，越慢越难（因为慢就密集），目前暂定为12）
+    protected int eliteBulletSpeed = GameActivity.WINDOW_HEIGHT/50; //ver2.0添加，精英敌机子弹速度（随难度成比例改变，越慢越难（因为慢就密集），目前暂定为12）
 
     protected int bossHp = 200; //ver4.0添加，用于设置boss敌机的生命值（随难度变化，目前暂定为150（五发子弹））
     protected int bossPower = 20; //ver4.0添加，boss敌机单个子弹的威力（随难度成比例改变,目前暂定为20）
-    protected int bossBulletSpeed = 10*GameActivity.WINDOW_HEIGHT/500; //ver4.0添加，boss敌机子弹速度（随难度成比例改变，目前暂定为9）
+    protected int bossBulletSpeed = GameActivity.WINDOW_HEIGHT/50; //ver4.0添加，boss敌机子弹速度（随难度成比例改变，目前暂定为9）
     protected int bossShootNum = 3; //ver4.0添加，boss敌机子弹数量（随难度改变，数越大横向散射的子弹越多，目前暂定为5）
 
     protected  EnemyFactory mef = new MobEnemyFactory(mobHp,mobSpeedY); //ver2.0添加
@@ -184,6 +186,8 @@ public class GameViewTest extends SurfaceView implements
     protected int bonus = 1000; //这里为了方便测试改成了1000积分，可修改
     protected static int bonusSelected = -1; //用户选择道具商城道具的标志，默认-1未选择，0~2是选择
 
+    /**激光**/
+    protected List<Bitmap> laserList;
     public GameViewTest(Context context, int screenWidth, int screenHeight) {
 
         super(context);
@@ -223,6 +227,12 @@ public class GameViewTest extends SurfaceView implements
         bossScore=100;
         enemyShootSpeed=1200;
         heroShootSpeed=600;
+
+        background=imageCompress(ImageManager.BACKGROUND_IMAGE);
+        laserList=new ArrayList<>();
+        for(int i=0;i<ImageManager.LASER_FRAMES.size();i++){
+            laserList.add(imageCompress(ImageManager.LASER_FRAMES.get(i)));
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -519,7 +529,7 @@ public class GameViewTest extends SurfaceView implements
         if (myLasEff != null){
             for (AbstractAircraft enemyAircraft : enemyAircrafts) {
                 if (enemyAircraft.crash(myLasEff)){
-                    enemyAircraft.decreaseHp(200);
+                    enemyAircraft.decreaseHp(80);
                     resEnemyFalling(enemyAircraft);
                 }
             }
@@ -554,7 +564,7 @@ public class GameViewTest extends SurfaceView implements
      * 治疗道具生效反响函数
      * **/
     private void resBloodPropActive(BaseProp prop){
-        heroAircraft.setHp(heroAircraft.getHp() + ((BloodProp) prop).getBloodHeal());
+        heroAircraft.decreaseHp(-20);
     }
 
     /**
@@ -933,7 +943,7 @@ public class GameViewTest extends SurfaceView implements
                 draw();
             }
             try {
-                Thread.sleep(25);
+                Thread.sleep(40);
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -941,14 +951,17 @@ public class GameViewTest extends SurfaceView implements
     }
 
     public void paint(Canvas cvs){
+        //清空之前的绘图
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
         //滚动算法
         Log.i("Height",GameActivity.WINDOW_HEIGHT+"");
         Log.i("ImageHeigh",ImageManager.BACKGROUND_IMAGE.getHeight()+"");
         y1=(y1>=GameActivity.WINDOW_HEIGHT)?y2:y1+GameActivity.WINDOW_HEIGHT/500;
-        y2=y1-ImageManager.BACKGROUND_IMAGE.getHeight();
-
-        cvs.drawBitmap(ImageManager.BACKGROUND_IMAGE, 0, y1, mPaint);
-        cvs.drawBitmap(ImageManager.BACKGROUND_IMAGE, 0, y2, mPaint);
+//        y2=y1-ImageManager.BACKGROUND_IMAGE.getHeight();
+        y2=y1-background.getHeight();
+        cvs.drawBitmap(background, 0, y1, mPaint);
+        cvs.drawBitmap(background, 0, y2, mPaint);
 
         // 先绘制子弹，后绘制飞机
         // 这样子弹显示在飞机的下层
@@ -988,7 +1001,7 @@ public class GameViewTest extends SurfaceView implements
      * */
     private void laserFrameAni(Canvas cvs){
         if(laser != null) {
-            Bitmap laserFrame = ImageManager.LASER_FRAMES.get(laserFrameCount / 2);
+            Bitmap laserFrame = laserList.get(laserFrameCount / 2);
             cvs.drawBitmap(laserFrame,
                     laser.getLocationX() - laserFrame.getWidth() / 2,
                     laser.getLocationY() - laserFrame.getHeight(), mPaint);
@@ -1040,7 +1053,7 @@ public class GameViewTest extends SurfaceView implements
         int x = 10;
         int y = 100;
         mPaint.setTypeface(Typeface.create(Typeface.SANS_SERIF,Typeface.BOLD));
-        mPaint.setTextSize(100);
+        mPaint.setTextSize(screenHeight/25);
         cvs.drawText("SCORE:" + this.score, x, y, mPaint);
         y = y + 100;
         cvs.drawText("LIFE:" + this.heroAircraft.getHp(), x, y, mPaint);
@@ -1147,8 +1160,9 @@ public class GameViewTest extends SurfaceView implements
         ImageManager.LASER_FRAMES = new ArrayList<>();
         ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser1));
         ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser2));
-        ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser3));
-        ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser4));
+       ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser3));
+       ImageManager.LASER_FRAMES.add(BitmapFactory.decodeResource(getResources(), R.drawable.laser4));
+
     }
 
     /**
@@ -1198,6 +1212,22 @@ public class GameViewTest extends SurfaceView implements
                     break;
             }
         }
+
+    }
+    /**图片缩放代码**/
+    public Bitmap imageCompress(Bitmap image){
+        Bitmap newBitmap=image;
+        int width =image.getWidth();
+        int height=image.getHeight();
+        float Width;
+        float Height;
+        Matrix matrix=new Matrix();
+        Width=((float)screenWidth)/width;
+        Height=((float)screenHeight)/height;
+        matrix.postScale(Width,Height);
+        newBitmap=Bitmap.createBitmap(image,0,0,width,height,matrix,true);
+
+        return newBitmap;
     }
 }
 

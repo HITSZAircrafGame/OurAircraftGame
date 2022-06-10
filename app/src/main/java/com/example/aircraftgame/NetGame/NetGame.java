@@ -44,13 +44,13 @@ public class NetGame extends DifficultGameView {
         int y = 100;
         mPaint.setColor(R.color.red);
         mPaint.setTypeface(Typeface.create(Typeface.SANS_SERIF,Typeface.BOLD));
-        mPaint.setTextSize(100);
+        mPaint.setTextSize(screenHeight/25);
         cvs.drawText("SCORE:" + this.score, x, y, mPaint);
         y = y + 100;
         cvs.drawText("LIFE:" + this.heroAircraft.getHp(), x, y, mPaint);
 
         y=y+100;
-        mPaint.setColor(R.color.light_blue_400);
+        mPaint.setColor(R.color.red);
         cvs.drawText("opponent Player",x,y,mPaint);
         y+=100;
         cvs.drawText("SCORE:"+score2,x,y,mPaint);

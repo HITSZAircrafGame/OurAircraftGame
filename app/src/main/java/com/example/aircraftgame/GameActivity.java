@@ -2,6 +2,7 @@ package com.example.aircraftgame;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.example.aircraftgame.GameDifficulty.DifficultGameView;
 import com.example.aircraftgame.GameDifficulty.EasyGameView;
@@ -60,6 +62,11 @@ public class GameActivity extends AppCompatActivity {
     //点击次数标记，处理点击抖动
     private static int touchTime;
 
+    //修改图片
+    ImageView imageView1;
+    private boolean imageFlag;
+    ImageView imageView2;
+    @SuppressLint({"ResourceType", "UseCompatLoadingForDrawables"})
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -70,11 +77,13 @@ public class GameActivity extends AppCompatActivity {
         GameDifficulty = neededData.getIntExtra("difficulty", 1);
         Log.i("Game",GameNeedVideo+"");
         Log.i("Game",GameDifficulty+"");
+
         //隐藏标题全屏游玩
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindowSize();
         setContentView(R.layout.activity_main);
+        imageFlag=true;
         //Handler实例化
         mHandler=new mHandler();
 
@@ -166,12 +175,12 @@ public class GameActivity extends AppCompatActivity {
               Log.i(OnlineTAG,"发送连接请求");
               socket=new Socket();
               socket.connect(new InetSocketAddress("192.168.56.1",1111),5000);
-
               Log.i(OnlineTAG,"玩家连接完毕");
               output =new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
               input=new BufferedReader(new InputStreamReader(socket.getInputStream()));
               Log.i(OnlineTAG,"等待另一个玩家连接");
             if(input.readLine().equals("true")){
+                imageFlag=false;
                 gvt=new NetGame(GameActivity.this,WINDOW_WIDTH,WINDOW_HEIGHT);
                 msg.what=2;
                 msg.obj="Game";
@@ -239,6 +248,7 @@ public class GameActivity extends AppCompatActivity {
                     //发送初始化请求
                     output.println(PlayerInfo.playerInfo);
                     output.flush();
+                    imageFlag=true;
                     while((content= input.readLine())!=null){
                         PlayerInfo.playerInfo=new JSONObject(content);
                         Log.i(OnlineTAG,"Player Info: "+PlayerInfo.playerInfo+"");
@@ -261,7 +271,6 @@ public class GameActivity extends AppCompatActivity {
                     Log.i(OnlineTAG,"Disconnect Socket,game over");
                     PlayerInfo.playerInfo.put("OnlineDisconnect",true);
                     OnlineGameOver.flag=true;
-
                 }
                 catch(Exception e){
                     e.printStackTrace();
@@ -294,6 +303,7 @@ public class GameActivity extends AppCompatActivity {
                 default:
                     Log.i(OnlineTAG,"页面错误");
                     setContentView(R.layout.activity_main);
+
                     break;
             }
         }
@@ -310,6 +320,24 @@ public class GameActivity extends AppCompatActivity {
             return;
         } else {
             touchTime = myTouchTime;
+        }
+    }
+
+    /**修改等待页面的背景图**/
+    public void changeBackground(ImageView imageView){
+        int[] image=new int[]{R.drawable.wait1,R.drawable.wait2,R.drawable.wait3
+        ,R.drawable.wait4,R.drawable.wait5};
+        int count=0;
+        //轮播图
+        while(imageFlag){
+            try{
+                Thread.sleep(2000);
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        imageView.setImageResource(R.drawable.wait2);
+        Log.i("Loop","切换图片");
         }
     }
 }
