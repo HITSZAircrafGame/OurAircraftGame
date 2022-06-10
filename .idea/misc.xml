@@ -25,10 +25,14 @@
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_login_view.xml" value="0.264" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_main.xml" value="0.27395833333333336" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_main_menu.xml" value="0.27395833333333336" />
+        <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_online_battle_result.xml" value="0.27395833333333336" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_online_menu.xml" value="0.27395833333333336" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_rank_board.xml" value="0.264" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_register_view.xml" value="0.264" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_start.xml" value="0.27395833333333336" />
+        <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/activity_waiting.xml" value="0.27395833333333336" />
+        <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/online_battle_lose.xml" value="0.27395833333333336" />
+        <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/online_battle_win.xml" value="0.27395833333333336" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/sample_rand_board_view.xml" value="0.27395833333333336" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/sample_rank_board_view.xml" value="0.2" />
         <entry key="..\:/AndroidStudio/Projects/MyGame/OurAircraftGame/app/src/main/res/layout/view_delete_tip.xml" value="0.2" />

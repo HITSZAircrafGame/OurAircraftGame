@@ -271,6 +271,7 @@ public class GameActivity extends AppCompatActivity {
                     Log.i(OnlineTAG,"Disconnect Socket,game over");
                     PlayerInfo.playerInfo.put("OnlineDisconnect",true);
                     OnlineGameOver.flag=true;
+                    jumpToBattleResult();
                 }
                 catch(Exception e){
                     e.printStackTrace();
@@ -339,5 +340,19 @@ public class GameActivity extends AppCompatActivity {
         imageView.setImageResource(R.drawable.wait2);
         Log.i("Loop","切换图片");
         }
+        }
+    /**
+     * 对战结束跳转到结果界面
+     * */
+    public void jumpToBattleResult(){
+        Intent intent = new Intent(GameActivity.this, OnlineBattleResult.class);
+        startActivity(intent);
+//        try {
+//            if (PlayerInfo.playerInfo.getInt("Score") > PlayerInfo.playerInfo.getInt("Score2")){
+//                Intent intent = new Intent(this,)
+//            }
+//        } catch(Exception e){
+//            e.printStackTrace();
+//        }
     }
 }
