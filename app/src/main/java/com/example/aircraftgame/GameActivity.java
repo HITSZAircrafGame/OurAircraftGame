@@ -165,7 +165,7 @@ public class GameActivity extends AppCompatActivity {
               Message msg=Message.obtain();
               Log.i(OnlineTAG,"发送连接请求");
               socket=new Socket();
-              socket.connect(new InetSocketAddress("192.168.56.1",1111),5000);
+              socket.connect(new InetSocketAddress("192.168.43.32",1111),5000);
 
               Log.i(OnlineTAG,"玩家连接完毕");
               output =new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
@@ -261,7 +261,7 @@ public class GameActivity extends AppCompatActivity {
                     Log.i(OnlineTAG,"Disconnect Socket,game over");
                     PlayerInfo.playerInfo.put("OnlineDisconnect",true);
                     OnlineGameOver.flag=true;
-
+                    jumpToBattleResult();
                 }
                 catch(Exception e){
                     e.printStackTrace();
@@ -311,5 +311,20 @@ public class GameActivity extends AppCompatActivity {
         } else {
             touchTime = myTouchTime;
         }
+    }
+
+    /**
+     * 对战结束跳转到结果界面
+     * */
+    public void jumpToBattleResult(){
+        Intent intent = new Intent(GameActivity.this, OnlineBattleResult.class);
+        startActivity(intent);
+//        try {
+//            if (PlayerInfo.playerInfo.getInt("Score") > PlayerInfo.playerInfo.getInt("Score2")){
+//                Intent intent = new Intent(this,)
+//            }
+//        } catch(Exception e){
+//            e.printStackTrace();
+//        }
     }
 }
