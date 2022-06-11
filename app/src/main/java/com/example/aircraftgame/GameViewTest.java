@@ -684,7 +684,7 @@ public class GameViewTest extends SurfaceView implements
         if (shieldActive <= 5) {
             Log.i("Shield", "Shield supply start!");
             myShield = Shield.getShield(heroAircraft.getLocationX(),
-                    heroAircraft.getLocationY() - 100);
+                    heroAircraft.getLocationY());
             Runnable r = () -> {
                 int lastShieldActive;
                 lastShieldActive = shieldActive;
