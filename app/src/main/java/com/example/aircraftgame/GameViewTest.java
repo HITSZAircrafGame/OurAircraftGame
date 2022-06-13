@@ -590,7 +590,7 @@ public class GameViewTest extends SurfaceView implements
         if (fireActive <= 5) {
             Log.i("Fire", "Fire supply start");
             double rate = Math.random();
-            if (rate < 0.5f) {
+            if (rate < 0.3f) {
                 resScatterShootActive();
             } else {
                 resMagicArrowActive();
@@ -684,7 +684,7 @@ public class GameViewTest extends SurfaceView implements
         if (shieldActive <= 5) {
             Log.i("Shield", "Shield supply start!");
             myShield = Shield.getShield(heroAircraft.getLocationX(),
-                    heroAircraft.getLocationY() - 100);
+                    heroAircraft.getLocationY());
             Runnable r = () -> {
                 int lastShieldActive;
                 lastShieldActive = shieldActive;
@@ -786,7 +786,7 @@ public class GameViewTest extends SurfaceView implements
     public void createEliteProps(AbstractAircraft enemyAircraft){
         Random r = new Random();
         if(Math.random() < propOccur && props.size() < propMaxNumber){
-            if(r.nextFloat() < 0.2f){
+            if(r.nextFloat() < 0.1f){
                 props.add(blpf.createProp(enemyAircraft.getLocationX(),
                         enemyAircraft.getLocationY(),
                         (Math.random() > 0.5f ? 8:-8)*GameActivity.WINDOW_WIDTH/600,

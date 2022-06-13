@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
 
@@ -13,6 +14,7 @@ import com.example.aircraftgame.RankBoard;
 
 import PublicLockAndFlag.GameOverFlag;
 import PublicLockAndFlag.OnlineGameOver;
+import application.ImageManager;
 
 //Online Playing Model
 @SuppressLint("ViewConstructor")
@@ -42,18 +44,28 @@ public class NetGame extends DifficultGameView {
             }
         int x = 10;
         int y = 100;
-        mPaint.setColor(R.color.red);
+        mPaint.setColor(Color.RED);
         mPaint.setTypeface(Typeface.create(Typeface.SANS_SERIF,Typeface.BOLD));
-        mPaint.setTextSize(screenHeight/25);
+        mPaint.setTextSize(screenHeight/30);
         cvs.drawText("SCORE:" + this.score, x, y, mPaint);
         y = y + 100;
         cvs.drawText("LIFE:" + this.heroAircraft.getHp(), x, y, mPaint);
 
         y=y+100;
-        mPaint.setColor(R.color.red);
-        cvs.drawText("opponent Player",x,y,mPaint);
+        mPaint.setColor(Color.RED);
+        try {
+            cvs.drawText(PlayerInfo.playerInfo.getString("OpponentName"),x,y,mPaint);
+        }
+       catch(Exception e){
+           e.printStackTrace();
+       }
         y+=100;
         cvs.drawText("SCORE:"+score2,x,y,mPaint);
+        y = y + 20;
+        cvs.drawBitmap(ImageManager.MIPMAP_BONUS_IMAGE, x, y, mPaint);
+        y = y + 85;
+        x = x + 140;
+        cvs.drawText("" + this.bonus, x, y, mPaint);
     }
 
     //重写游戏结束的逻辑

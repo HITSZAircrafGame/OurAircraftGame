@@ -185,6 +185,7 @@ public class GameActivity extends AppCompatActivity {
                 msg.what=2;
                 msg.obj="Game";
                 mHandler.sendMessage(msg);
+                GameNeedVideo=true;
                 startMusic();
                 Log.i(OnlineTAG,"网络游戏开始");
                 new Client().start();
@@ -225,7 +226,7 @@ public class GameActivity extends AppCompatActivity {
         //设置service播放音乐
         //新建一条线程来执行
         if(GameNeedVideo){
-            Log.i("Game","播放音乐");
+            Log.i("Music","播放音乐");
             Intent intent=new Intent(this, MusicServer.class);
             new Thread(()->{
                 while(!GameOverFlag.gameOverFlag){
@@ -249,11 +250,13 @@ public class GameActivity extends AppCompatActivity {
                     output.println(PlayerInfo.playerInfo);
                     output.flush();
                     imageFlag=true;
+                    int count=1;
                     while((content= input.readLine())!=null){
                         PlayerInfo.playerInfo=new JSONObject(content);
                         Log.i(OnlineTAG,"Player Info: "+PlayerInfo.playerInfo+"");
                         //游戏未结束，持续输送信号
-                        if(GameOverFlag.gameOverFlag){
+                        if(GameOverFlag.gameOverFlag&&count==1){
+                            count=2;
                             PlayerInfo.playerInfo.put("GameOver",true);
                             Log.i(OnlineTAG,"Waiting the other player over");
 
